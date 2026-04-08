@@ -19,6 +19,14 @@
       "destination": "/api/index.js"
     },
     {
+      "source": "/assets/(.*)",
+      "destination": "/frontend/assets/$1"
+    },
+    {
+      "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|json|woff2?|webp))$",
+      "destination": "/frontend/$1"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/frontend/index.html"
     }
