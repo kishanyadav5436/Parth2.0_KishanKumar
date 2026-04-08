@@ -1,0 +1,292 @@
+import { useState, useEffect } from "react";
+import { useParams, Link, useSearchParams } from "react-router-dom";
+import { Search, SlidersHorizontal, ArrowLeft, Filter, Star, MapPin, Loader2, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Slider } from "../components/ui/slider";
+import { Label } from "../components/ui/label";
+import ServiceCard from "../components/ServiceCard";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
+
+export default function ServiceListings() {
+  const { category } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  const initialQuery = searchParams.get("q") || "";
+  const initialLocation = searchParams.get("loc") || "";
+
+  const [allProviders, setAllProviders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [locationQuery, setLocationQuery] = useState(initialLocation);
+  const [sortBy, setSortBy] = useState("rating");
+  const [priceRange, setPriceRange] = useState([0, 2000]);
+
+  useEffect(() => {
+    const fetchProviders = async () => {
+      setIsLoading(true);
+      try {
+        const url = category 
+          ? `/api/providers?category=${category}` 
+          : '/api/providers';
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        // Map backend schema to UI format
+        const mappedData = data.map((d: any) => ({
+          id: d._id,
+          name: d.user?.name || "Premium Provider",
+          service: d.category,
+          category: d.category.toLowerCase(),
+          rating: d.averageRating || 4.5,
+          reviews: d.totalReviews || 0,
+          price: `₹${d.hourlyRate}/hr`,
+          priceValue: d.hourlyRate,
+          location: d.location || "Mumbai, Maharashtra",
+          image: `https://images.unsplash.com/photo-1581578731548-c64695ce6952?auto=format&fit=crop&q=80&w=400`,
+          verified: true,
+          experience: "Expert"
+        }));
+        setAllProviders(mappedData);
+      } catch (err) {
+        console.error("Failed to fetch providers:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProviders();
+  }, [category]);
+
+  const filteredProviders = allProviders
+    .filter((provider) => {
+      const matchesSearch = !searchQuery || 
+        provider.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        provider.service.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesLocation = !locationQuery || 
+        provider.location.toLowerCase().includes(locationQuery.toLowerCase());
+
+      if (!matchesSearch || !matchesLocation) return false;
+      if (provider.priceValue < priceRange[0] || provider.priceValue > priceRange[1]) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === "rating") return b.rating - a.rating;
+      if (sortBy === "price-low") return a.priceValue - b.priceValue;
+      if (sortBy === "price-high") return b.priceValue - a.priceValue;
+      if (sortBy === "reviews") return b.reviews - a.reviews;
+      return 0;
+    });
+
+  const FilterContent = () => (
+    <div className="space-y-8">
+      <div>
+        <Label className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 block">Location</Label>
+        <div className="relative">
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Input 
+            placeholder="Filter by city..."
+            value={locationQuery}
+            onChange={(e) => setLocationQuery(e.target.value)}
+            className="pl-10 h-11 bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-xl"
+          />
+          {locationQuery && (
+            <button 
+              onClick={() => setLocationQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <Label className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 block">Sort By</Label>
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-full bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-xl h-11">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl border-gray-200 dark:border-slate-800">
+            <SelectItem value="rating">Highest Rated</SelectItem>
+            <SelectItem value="reviews">Most Reviews</SelectItem>
+            <SelectItem value="price-low">Price: Low to High</SelectItem>
+            <SelectItem value="price-high">Price: High to Low</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <Label className="text-sm font-bold text-gray-400 uppercase tracking-widest block">Price Range</Label>
+          <span className="text-blue-600 dark:text-blue-400 font-bold">₹{priceRange[0]} - ₹{priceRange[1]}</span>
+        </div>
+        <Slider
+          value={priceRange}
+          onValueChange={setPriceRange}
+          max={2000}
+          step={50}
+          className="mt-2"
+        />
+        <div className="flex justify-between mt-2 text-xs text-gray-400 font-medium">
+          <span>₹0</span>
+          <span>₹2000+</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
+      {/* Mesh Gradient Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-30 dark:opacity-20">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/30 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-400/30 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-12 relative">
+        {/* Header Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6"
+        >
+          <div>
+            <Link to="/" className="inline-flex items-center text-sm font-bold text-blue-600 dark:text-blue-400 hover:gap-2 transition-all mb-4 group">
+              <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+              BACK TO EXPLORE
+            </Link>
+            <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-4">
+              {category
+                ? `${category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ')}`
+                : "All Services"}
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 text-lg max-w-2xl font-medium">
+              Discover top-rated professionals in your neighborhood, verified for quality and reliability.
+            </p>
+          </div>
+          <div className="bg-white dark:bg-slate-900 px-6 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm inline-flex items-center">
+            <span className="text-2xl font-black text-blue-600 dark:text-blue-400 mr-2">{filteredProviders.length}</span>
+            <span className="text-slate-500 dark:text-slate-400 font-bold uppercase text-xs tracking-widest">Experts Available</span>
+          </div>
+        </motion.div>
+
+        <div className="grid lg:grid-cols-4 gap-8">
+          {/* Sidebar Filters (Desktop) */}
+          <motion.aside 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="hidden lg:block space-y-8 sticky top-24 h-fit"
+          >
+            <div className="glass-card p-8 rounded-[2rem] border-white/20 dark:border-slate-800 shadow-xl shadow-black/5">
+              <div className="flex items-center gap-2 mb-8 text-slate-900 dark:text-white font-black text-xl uppercase tracking-tight">
+                <Filter className="h-6 w-6 text-blue-600" />
+                Filters
+              </div>
+              <FilterContent />
+            </div>
+          </motion.aside>
+
+          {/* Main Content Area */}
+          <div className="lg:col-span-3">
+            <div className="mb-8 flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative group">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                <Input
+                  placeholder="Search by name, expertise, or keywords..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-12 h-14 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl text-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
+                />
+                {searchQuery && (
+                  <button 
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Mobile Filter Trigger */}
+              <Sheet>
+                <SheetTrigger asChild className="lg:hidden">
+                  <Button variant="outline" className="h-14 px-6 rounded-2xl border-slate-200 dark:border-slate-800 dark:text-white font-black">
+                    <SlidersHorizontal className="h-5 w-5 mr-2" />
+                    Refine
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[320px] dark:bg-slate-950 dark:border-slate-800">
+                  <SheetHeader>
+                    <SheetTitle className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Filters</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-12">
+                    <FilterContent />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+
+            {/* Provider Grid */}
+            <AnimatePresence mode="wait">
+              {isLoading ? (
+                <motion.div 
+                  key="loading"
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  exit={{ opacity: 0 }}
+                  className="grid md:grid-cols-2 gap-8"
+                >
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-[400px] w-full rounded-[2.5rem] bg-slate-200 dark:bg-slate-800 animate-pulse"></div>
+                  ))}
+                </motion.div>
+              ) : filteredProviders.length > 0 ? (
+                <motion.div 
+                  key="grid"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="grid md:grid-cols-2 gap-8"
+                >
+                  {filteredProviders.map((provider) => (
+                    <ServiceCard key={provider.id} provider={provider} />
+                  ))}
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-24 bg-white/50 dark:bg-slate-900/50 rounded-[3rem] border border-dashed border-slate-300 dark:border-slate-800"
+                >
+                  <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Search className="h-10 w-10 text-slate-300 dark:text-slate-600" />
+                  </div>
+                  <h3 className="text-2xl font-black dark:text-white mb-2 tracking-tight">No Match Found</h3>
+                  <p className="text-slate-500 dark:text-slate-400 font-medium">
+                    Try adjusting your filters or search keywords to find what you're looking for.
+                  </p>
+                  <Button 
+                    variant="link" 
+                    className="mt-4 text-blue-600 font-bold"
+                    onClick={() => {
+                        setSearchQuery("");
+                        setLocationQuery("");
+                        setPriceRange([0, 2000]);
+                    }}
+                  >
+                    Clear all filters
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
