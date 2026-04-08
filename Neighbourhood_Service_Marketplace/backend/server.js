@@ -19,9 +19,10 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Configure CORS for production (Vercel) and development (Localhost)
-const allowedOrigin = process.env.FRONTEND_URL || true;
 app.use(cors({ 
-    origin: allowedOrigin, 
+    origin: function (origin, callback) {
+        callback(null, true); // Safely reflect the origin during testing/hackathon mode to prevent trailing-slash mismatches
+    }, 
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 }));
@@ -43,6 +44,6 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
