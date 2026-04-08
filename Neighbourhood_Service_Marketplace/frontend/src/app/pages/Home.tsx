@@ -10,6 +10,7 @@ import { Input } from "../components/ui/input";
 import CategoryCard from "../components/CategoryCard";
 import ServiceCard from "../components/ServiceCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
+import { API_BASE_URL } from "../config";
 
 const categories = [
   { id: "ac-repair", name: "AC Repair", icon: "❄️", image: "https://images.unsplash.com/photo-1630481721508-5d37097dd8fc?auto=format&fit=crop&q=80&w=400", providers: 68 },
@@ -97,7 +98,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetch('/api/services')
+    fetch(`${API_BASE_URL}/api/services`)
       .then(res => res.json())
       .then(data => {
         const mappedData = data.slice(0, 3).map((d: any) => ({
@@ -279,7 +280,7 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ───────────────────────────── */}
-      <section id="how-it-works" className="py-24 px-4 bg-white dark:bg-slate-900/50">
+      <section id="how-it-works" className="py-24 px-4 bg-white dark:bg-slate-900/50 scroll-mt-20">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -16,6 +16,7 @@ import { Calendar as CalendarComponent } from "../components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { format } from "date-fns";
 import { useAppContext } from "../context/AppContext";
+import { API_BASE_URL } from "../config";
 
 const timeSlots = [
   "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
@@ -59,7 +60,7 @@ export default function Booking() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const res = await fetch(`/api/services/${serviceId}`, { credentials: 'include' });
+        const res = await fetch(`${API_BASE_URL}/api/services/${serviceId}`, { credentials: 'include' });
         if (!res.ok) throw new Error("Service not found");
         const data = await res.json();
         setService(data);
@@ -90,7 +91,7 @@ export default function Booking() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/bookings', {
+      const response = await fetch(`${API_BASE_URL}/api/bookings`, {
         method: 'POST',
         credentials: 'include',           
         headers: { 'Content-Type': 'application/json' },

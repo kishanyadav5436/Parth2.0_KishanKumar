@@ -9,6 +9,7 @@ import { Switch } from "../components/ui/switch";
 import { Label } from "../components/ui/label";
 import { Badge } from "../components/ui/badge";
 import { useNavigate, Link } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 export default function Settings() {
   const { user, setUser, theme, toggleTheme } = useAppContext();
@@ -17,7 +18,7 @@ export default function Settings() {
 
   const handleSignOut = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      await fetch(`${API_BASE_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });
     } catch (e) {}
     setUser(null);
     navigate('/');

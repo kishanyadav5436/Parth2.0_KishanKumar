@@ -10,6 +10,7 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { useAppContext } from "../context/AppContext";
 import { format } from "date-fns";
+import { API_BASE_URL } from "../config";
 
 type BookingStatus = "pending" | "accepted" | "completed" | "rejected";
 
@@ -78,7 +79,7 @@ export default function MyBookings() {
   const fetchBookings = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/bookings", { credentials: "include" });
+      const res = await fetch(`${API_BASE_URL}/api/bookings`, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch bookings");
       const data = await res.json();
       setBookings(data);
@@ -101,7 +102,7 @@ export default function MyBookings() {
     if (!confirm("Cancel this booking?")) return;
     setCancelling(bookingId);
     try {
-      const res = await fetch(`/api/bookings/${bookingId}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}/status`, {
         method: "PATCH",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -395,7 +396,7 @@ export default function MyBookings() {
                                 size="sm"
                                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl h-9 px-4 shadow-sm text-xs gap-1"
                                 onClick={async () => {
-                                  const res = await fetch(`/api/bookings/${booking._id}/status`, {
+                                  const res = await fetch(`${API_BASE_URL}/api/bookings/${booking._id}/status`, {
                                     method: "PATCH", credentials: "include",
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({ status: "accepted" }),

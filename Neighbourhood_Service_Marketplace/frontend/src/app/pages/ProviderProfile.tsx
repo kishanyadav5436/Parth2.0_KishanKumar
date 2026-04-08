@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
 import { Separator } from "../components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { API_BASE_URL } from "../config";
 
 export default function ProviderProfile() {
   const { id } = useParams();
@@ -20,11 +21,11 @@ export default function ProviderProfile() {
     const fetchProfile = async () => {
       try {
         // Try fetching by Profile ID first
-        let profileRes = await fetch(`/api/providers/${id}`);
+        let profileRes = await fetch(`${API_BASE_URL}/api/providers/${id}`);
         
         // If not found, try fetching by User ID
         if (!profileRes.ok) {
-          profileRes = await fetch(`/api/providers/user/${id}`);
+          profileRes = await fetch(`${API_BASE_URL}/api/providers/user/${id}`);
         }
         
         if (!profileRes.ok) throw new Error('Profile not found');
@@ -34,14 +35,14 @@ export default function ProviderProfile() {
         const userId = profileData.user?._id || profileData.user;
 
         // Fetch Reviews
-        const reviewsRes = await fetch(`/api/reviews/provider/${userId}`);
+        const reviewsRes = await fetch(`${API_BASE_URL}/api/reviews/provider/${userId}`);
         if (reviewsRes.ok) {
           const reviewsData = await reviewsRes.json();
           setReviews(reviewsData);
         }
-
+    
         // Fetch Services for this provider
-        const servicesRes = await fetch(`/api/services?provider=${userId}`);
+        const servicesRes = await fetch(`${API_BASE_URL}/api/services?provider=${userId}`);
         if (servicesRes.ok) {
           const servicesData = await servicesRes.json();
           setServices(servicesData);

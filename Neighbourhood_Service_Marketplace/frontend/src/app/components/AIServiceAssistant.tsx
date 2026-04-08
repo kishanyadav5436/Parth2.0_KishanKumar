@@ -7,12 +7,12 @@ import { Input } from "./ui/input";
 import { useNavigate } from "react-router-dom";
 
 const categories = [
-  { id: "ac-repair", keywords: ["ac", "air conditioner", "cooling", "heat", "filter"], name: "AC Repair" },
-  { id: "plumbing", keywords: ["water", "leak", "pipe", "tap", "bathroom", "toilet", "drain"], name: "Plumbing" },
-  { id: "electrical", keywords: ["light", "switch", "wire", "shock", "fan", "electricity", "power"], name: "Electrician" },
-  { id: "cleaning", keywords: ["clean", "dust", "mop", "wash", "house", "apartment", "sofa"], name: "Home Cleaning" },
-  { id: "painting", keywords: ["paint", "color", "wall", "interior", "exterior", "brush"], name: "Painting" },
-  { id: "pest-control", keywords: ["pest", "ant", "roach", "termite", "bug", "insect", "spider"], name: "Pest Control" },
+  { id: "ac-repair", keywords: ["ac", "air conditioner", "cooling", "heat", "filter", "ac repair"], name: "AC Repair" },
+  { id: "plumbing", keywords: ["water", "leak", "pipe", "tap", "bathroom", "toilet", "drain", "plumber"], name: "Plumbing" },
+  { id: "electrical", keywords: ["light", "switch", "wire", "shock", "fan", "electricity", "power", "electrician"], name: "Electrician" },
+  { id: "cleaning", keywords: ["clean", "dust", "mop", "wash", "house", "apartment", "sofa", "cleaning"], name: "Home Cleaning" },
+  { id: "painting", keywords: ["paint", "color", "wall", "interior", "exterior", "brush", "painting"], name: "Painting" },
+  { id: "pest-control", keywords: ["pest", "ant", "roach", "termite", "bug", "insect", "spider", "pest control"], name: "Pest Control" },
 ];
 
 export default function AIServiceAssistant() {

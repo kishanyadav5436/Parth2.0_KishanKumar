@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+import { API_BASE_URL } from '../config';
+
 interface User {
   id: string;
   name: string;
@@ -39,7 +41,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     // Check auth on mount
     const checkAuth = async () => {
       try {
-        const res = await fetch('/api/auth/me'); // Assuming there's a /me endpoint
+        const res = await fetch(`${API_BASE_URL}/api/auth/me`); // Assuming there's a /me endpoint
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);

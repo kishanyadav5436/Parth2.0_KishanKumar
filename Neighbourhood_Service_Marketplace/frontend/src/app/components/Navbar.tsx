@@ -5,12 +5,23 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import { Badge } from "./ui/badge";
+import { API_BASE_URL } from "../config";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, theme, toggleTheme } = useAppContext();
+  const { user, setUser, theme, toggleTheme } = useAppContext();
+
+  const handleSignOut = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });
+    } catch (e) {}
+    setUser(null);
+    setIsUserMenuOpen(false);
+    setIsMobileMenuOpen(false);
+    navigate('/');
+  };
 
   const isProvider = user?.role === 'provider';
 
@@ -102,7 +113,7 @@ export default function Navbar() {
                         Settings
                       </Link>
                       <button
-                        onClick={() => { setIsUserMenuOpen(false); }}
+                        onClick={handleSignOut}
                         className="flex items-center w-full px-3 py-2 rounded-xl text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
                       >
                         <LogOut className="h-4 w-4 mr-3" />
@@ -175,7 +186,7 @@ export default function Navbar() {
                     <Settings className="h-4 w-4 mr-2 text-slate-400" /> Settings
                   </Link>
                   <button 
-                    onClick={() => { setIsMobileMenuOpen(false); /* logout logic here */ }}
+                    onClick={handleSignOut}
                     className="text-left w-full px-4 py-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-semibold transition-colors flex items-center"
                   >
                     <LogOut className="h-4 w-4 mr-2" /> Sign Out
