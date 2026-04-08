@@ -18,11 +18,10 @@ const app = express();
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configure CORS for production (Vercel) and development (Localhost)
-app.use(cors({ 
+app.use(cors({
     origin: function (origin, callback) {
-        callback(null, true); // Safely reflect the origin during testing/hackathon mode to prevent trailing-slash mismatches
-    }, 
+        callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 }));
@@ -43,7 +42,13 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: 'Internal Server Error', error: err.message });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// Export app for Vercel Serverless Functions
+module.exports = app;
+
+// Only start a local HTTP server when running outside Vercel (i.e., local dev)
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
