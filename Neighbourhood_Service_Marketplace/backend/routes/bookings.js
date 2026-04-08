@@ -7,7 +7,7 @@ const { verifyToken } = require('../middleware/auth');
 // Create a new booking — requires auth cookie
 router.post('/', verifyToken, async (req, res) => {
     try {
-        const { serviceId, date, timeSlot, description, phone, address } = req.body;
+        const { serviceId, date, timeSlot, description, phone, address, paymentMethod } = req.body;
 
         if (!serviceId) return res.status(400).json({ message: 'Service ID is required' });
         if (!date) return res.status(400).json({ message: 'Date is required' });
@@ -24,7 +24,8 @@ router.post('/', verifyToken, async (req, res) => {
             timeSlot: timeSlot || '',
             description: description || '',
             phone: phone || '',
-            address: address || ''
+            address: address || '',
+            paymentMethod: paymentMethod || 'cash'
         });
 
         await newBooking.save();

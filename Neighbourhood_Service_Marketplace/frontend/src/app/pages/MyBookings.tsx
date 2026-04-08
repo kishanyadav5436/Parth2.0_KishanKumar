@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Calendar, Clock, MapPin, Phone, User, CheckCircle2,
   XCircle, AlertCircle, Loader2, Lock, RefreshCw,
-  ArrowRight, Package, Star
+  ArrowRight, Package, Star, Banknote
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../components/ui/button";
@@ -24,6 +24,7 @@ interface Booking {
   description: string;
   phone: string;
   address: string;
+  paymentMethod?: string;
   status: BookingStatus;
   createdAt: string;
 }
@@ -302,12 +303,13 @@ export default function MyBookings() {
                       </div>
 
                       {/* Details grid */}
-                      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+                      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-5">
                         {[
                           { icon: Calendar, label: "Date", value: booking.date ? format(new Date(booking.date), "MMM dd, yyyy") : "—" },
                           { icon: Clock, label: "Time", value: booking.timeSlot || "Not specified" },
                           { icon: Phone, label: "Phone", value: booking.phone || "Not provided" },
                           { icon: MapPin, label: "Address", value: booking.address || "Not provided" },
+                          { icon: Banknote, label: "Payment", value: booking.paymentMethod ? booking.paymentMethod.toUpperCase() : "CASH" },
                         ].map(({ icon: Icon, label, value }) => (
                           <div key={label} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3">
                             <div className="flex items-center gap-1.5 mb-1">

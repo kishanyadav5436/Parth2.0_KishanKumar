@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -29,27 +30,52 @@ interface MapViewProps {
   providers: any[];
 }
 
-// Center map component
-function ChangeView({ center, zoom }: any) {
+const cityCoordinates: Record<string, [number, number]> = {
+  'Mumbai': [19.0760, 72.8777],
+  'Delhi': [28.7041, 77.1025],
+  'Bangalore': [12.9716, 77.5946],
+  'Hyderabad': [17.3850, 78.4867],
+  'Chennai': [13.0827, 80.2707],
+  'Pune': [18.5204, 73.8567],
+  'Default': [22.9734, 78.6569] // Central India
+};
+
+// Fit map to markers component
+function MapBounds({ markers }: { markers: any[] }) {
   const map = useMap();
-  map.setView(center, zoom);
+  
+  useEffect(() => {
+    if (markers.length > 0) {
+      const bounds = L.latLngBounds(markers.map(m => [m.lat, m.lng]));
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+    }
+  }, [markers, map]);
+  
   return null;
 }
 
 export default function MapView({ providers }: MapViewProps) {
   const navigate = useNavigate();
   
-  // Default to Mumbai center if no providers
-  const defaultCenter: [number, number] = [19.0760, 72.8777];
-  
-  // Mock coordinates for providers if they don't have them
-  // In a real app, these would come from the backend/geocoding
-  const providersWithCoords = providers.map((p, i) => ({
-    ...p,
-    // Slightly offset from center for better visualization
-    lat: p.lat || (19.0760 + (Math.random() - 0.5) * 0.1),
-    lng: p.lng || (72.8777 + (Math.random() - 0.5) * 0.1)
-  }));
+  // Mapping locations to actual coordinates
+  const providersWithCoords = providers.map((p, i) => {
+    let baseCoords = cityCoordinates['Default'];
+    if (p.location) {
+      for (const [city, coords] of Object.entries(cityCoordinates)) {
+        if (p.location.toLowerCase().includes(city.toLowerCase())) {
+          baseCoords = coords;
+          break;
+        }
+      }
+    }
+
+    return {
+      ...p,
+      // Random micro-jitter so pins in the same city don't perfectly overlap
+      lat: p.lat || (baseCoords[0] + (Math.random() - 0.5) * 0.08),
+      lng: p.lng || (baseCoords[1] + (Math.random() - 0.5) * 0.08)
+    };
+  });
 
   return (
     <motion.div 
@@ -58,8 +84,8 @@ export default function MapView({ providers }: MapViewProps) {
       className="w-full h-full rounded-[2rem] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl relative z-10"
     >
       <MapContainer 
-        center={defaultCenter} 
-        zoom={12} 
+        center={[22.9734, 78.6569]} 
+        zoom={5} 
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={false}
       >
@@ -70,7 +96,7 @@ export default function MapView({ providers }: MapViewProps) {
             : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"}
         />
 
-        <ChangeView center={defaultCenter} zoom={12} />
+        <MapBounds markers={providersWithCoords} />
         
         {providersWithCoords.map((provider) => (
           <Marker 
@@ -96,10 +122,10 @@ export default function MapView({ providers }: MapViewProps) {
                   <span className="text-xs font-black">{provider.price}</span>
                   <Button 
                     size="sm" 
-                    onClick={() => navigate(`/services/${provider.id}`)}
+                    onClick={() => navigate(`/provider/${provider.providerId || provider.id}`)}
                     className="h-7 px-3 text-[10px] font-black bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
                   >
-                    View Profle
+                    View Profile
                   </Button>
                 </div>
               </div>

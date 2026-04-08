@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Calendar, Clock, MapPin, User, Mail, Phone, MessageSquare,
-  ArrowLeft, ShieldCheck, CheckCircle2, Loader2, AlertCircle, Lock
+  ArrowLeft, ShieldCheck, CheckCircle2, Loader2, AlertCircle, Lock,
+  CreditCard, Wallet, Banknote
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
@@ -40,6 +41,7 @@ export default function Booking() {
     phone: "",
     address: "",
     message: "",
+    paymentMethod: "cash",
   });
 
   // Populate form from user context once available
@@ -99,6 +101,7 @@ export default function Booking() {
           description: formData.message,
           phone: formData.phone,
           address: formData.address,
+          paymentMethod: formData.paymentMethod,
         }),
       });
 
@@ -356,6 +359,37 @@ export default function Booking() {
                 </div>
               </Card>
 
+              {/* Payment Method */}
+              <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 md:p-8 rounded-3xl shadow-sm">
+                <h2 className="text-xl font-black dark:text-white mb-6 flex items-center gap-3">
+                  <div className="h-7 w-1 bg-amber-500 rounded-full" />
+                  Payment Method
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {[
+                    { id: "cash", label: "Cash on Service", icon: Banknote },
+                    { id: "upi", label: "UPI / Wallet", icon: Wallet },
+                    { id: "card", label: "Credit/Debit Card", icon: CreditCard },
+                  ].map((method) => {
+                    const isSelected = formData.paymentMethod === method.id;
+                    return (
+                      <div
+                        key={method.id}
+                        onClick={() => setFormData({ ...formData, paymentMethod: method.id })}
+                        className={`cursor-pointer rounded-2xl border-2 p-4 flex flex-col items-center justify-center gap-3 transition-all ${
+                          isSelected
+                            ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold"
+                            : "border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-blue-300 dark:hover:border-slate-700"
+                        }`}
+                      >
+                        <method.icon className={`h-6 w-6 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-slate-400"}`} />
+                        <span className="text-sm text-center">{method.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+
               {/* Submit */}
               <Button
                 type="submit"
@@ -366,12 +400,12 @@ export default function Booking() {
                 {isSubmitting ? (
                   <><Loader2 className="h-5 w-5 animate-spin" /> Processing Booking...</>
                 ) : (
-                  <><CheckCircle2 className="h-5 w-5" /> Confirm Booking Request</>
+                  <><CheckCircle2 className="h-5 w-5" /> Confirm & Pay via {formData.paymentMethod === "cash" ? "Cash" : formData.paymentMethod === "upi" ? "UPI" : "Card"}</>
                 )}
               </Button>
 
               <p className="text-center text-xs text-slate-400 dark:text-slate-500 font-medium">
-                🔒 Your information is encrypted and stored securely. No payment required until job completion.
+                🔒 Your information is encrypted and stored securely. {formData.paymentMethod === "cash" ? "No payment required now." : "You will be redirected securely."}
               </p>
             </form>
           </div>

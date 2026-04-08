@@ -297,13 +297,26 @@ export default function ServiceListings() {
               ) : (
                 <motion.div 
                   key="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center py-24 bg-white/50 dark:bg-slate-900/50 rounded-[3rem] border border-dashed border-slate-300 dark:border-slate-800"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  className="text-center py-24 bg-white/40 dark:bg-slate-900/40 backdrop-blur-3xl rounded-[3rem] border border-blue-200/50 dark:border-blue-500/20 shadow-2xl relative overflow-hidden"
                 >
-                  <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Search className="h-10 w-10 text-slate-300 dark:text-slate-600" />
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none"></div>
+                  
+                  <motion.div 
+                    initial={{ y: 20 }}
+                    animate={{ y: [0, -15, 0] }}
+                    transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                    className="relative w-56 h-56 mx-auto mb-8"
+                  >
+                    <div className="absolute inset-0 bg-blue-500/30 dark:bg-blue-600/20 blur-3xl rounded-full"></div>
+                    <img 
+                      src="/illustrations/empty_search.png" 
+                      alt="No Results" 
+                      className="w-full h-full object-contain relative z-10 drop-shadow-2xl"
+                    />
+                  </motion.div>
                   <h3 className="text-2xl font-black dark:text-white mb-2 tracking-tight">No Match Found</h3>
                   <p className="text-slate-500 dark:text-slate-400 font-medium">
                     Try adjusting your filters or search keywords to find what you're looking for.

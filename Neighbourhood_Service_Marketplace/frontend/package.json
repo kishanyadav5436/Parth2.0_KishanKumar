@@ -27,6 +27,7 @@
     "framer-motion": "^10.16.4",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.292.0",
+    "neighbourhood-service-marketplace-root": "file:..",
     "react": "^18.2.0",
     "react-day-picker": "^9.14.0",
     "react-dom": "^18.2.0",

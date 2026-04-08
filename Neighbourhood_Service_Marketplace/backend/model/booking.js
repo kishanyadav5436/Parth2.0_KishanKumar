@@ -41,6 +41,16 @@ const bookingSchema = new mongoose.Schema({
     address: {
         type: String,
         default: ''
+    },
+    paymentMethod: {
+        type: String,
+        enum: ['cash', 'upi', 'card'],
+        default: 'cash'
+    },
+    paymentStatus: {
+        type: String,
+        enum: ['pending', 'paid', 'failed'],
+        default: 'pending'
     }
 }, { timestamps: true });
 
