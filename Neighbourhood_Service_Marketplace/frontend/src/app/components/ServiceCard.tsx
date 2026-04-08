@@ -7,6 +7,7 @@ import { Badge } from "./ui/badge";
 interface ServiceCardProps {
   provider: {
     id: string;
+    providerId?: string;
     name: string;
     service: string;
     rating: number;
@@ -26,7 +27,8 @@ export default function ServiceCard({ provider }: ServiceCardProps) {
       transition={{ type: "spring", stiffness: 350, damping: 25 }}
       className="h-full"
     >
-      <div className="relative group h-full bg-white dark:bg-slate-900 rounded-[2rem] overflow-hidden shadow-lg dark:shadow-black/30 hover:shadow-2xl dark:hover:shadow-blue-900/20 transition-shadow duration-500 flex flex-col border border-slate-100 dark:border-slate-800">
+      <div className="relative group h-full bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-black/40 hover:shadow-2xl hover:shadow-blue-600/10 dark:hover:shadow-blue-900/20 transition-all duration-500 flex flex-col border border-slate-100 dark:border-white/5">
+
 
         {/* Image area */}
         <div className="relative h-52 overflow-hidden">
@@ -96,7 +98,8 @@ export default function ServiceCard({ provider }: ServiceCardProps) {
 
           {/* CTA Buttons */}
           <div className="flex gap-2.5 mt-auto">
-            <Link to={`/provider/${provider.id}`} className="flex-1">
+            <Link to={`/provider/${provider.providerId || provider.id}`} className="flex-1">
+
               <Button
                 variant="outline"
                 className="w-full h-11 rounded-xl border-slate-200 dark:border-slate-700 dark:text-white dark:hover:bg-slate-800 font-bold text-sm transition-all hover:border-blue-400 dark:hover:border-blue-600"

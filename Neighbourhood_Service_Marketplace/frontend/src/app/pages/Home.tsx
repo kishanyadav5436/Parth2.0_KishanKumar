@@ -97,23 +97,27 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetch('/api/providers')
+    fetch('/api/services')
       .then(res => res.json())
       .then(data => {
         const mappedData = data.slice(0, 3).map((d: any) => ({
-          id: d._id || d.id,
-          name: d.user?.name || "Premium Provider",
-          service: d.category || "General Service",
-          rating: d.averageRating || 5,
-          reviews: d.totalReviews || 0,
-          price: `₹${d.hourlyRate}/hr`,
+          id: d._id,
+          providerId: d.provider?._id || d.provider,
+          name: d.provider?.name || "Premium Provider",
+
+          service: d.title,
+          category: d.category,
+          rating: d.rating || 5,
+          reviews: d.reviews || 0,
+          price: `₹${d.price}/hr`,
           location: d.location || "Mumbai, Maharashtra",
-          image: "https://images.unsplash.com/photo-1581578731548-c64695ce6952?auto=format&fit=crop&q=80&w=400",
+          image: d.image || "https://images.unsplash.com/photo-1581578731548-c64695ce6952?auto=format&fit=crop&q=80&w=400",
           verified: true,
-          experience: "5+ years"
+          experience: "Expert"
         }));
         setFeaturedProviders(mappedData);
       })
+
       .catch(err => console.error(err))
       .finally(() => setIsLoading(false));
   }, []);

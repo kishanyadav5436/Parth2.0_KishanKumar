@@ -49,15 +49,50 @@ async function seed() {
             }
         ]);
 
-        // Create Reviews
-        await Review.create({
-            customer: users[3]._id,
-            provider: users[0]._id, // Points to the User ID of the provider
-            rating: 5,
-            comment: 'Rajesh was amazing! He fixed my AC in no time and was very professional.'
-        });
+        const Service = require('./model/service');
 
-        console.log('Seeding complete with reviews!');
+
+        // Create Services
+        await Service.deleteMany({});
+        const services = await Service.insertMany([
+            {
+                title: 'High-Efficiency AC Repair',
+                category: 'AC Repair',
+                price: 450,
+                provider: users[0]._id,
+                description: 'Complete maintenance and repair of split and window AC units.',
+                location: 'Mumbai, Maharashtra'
+            },
+            {
+                title: 'Deep Home Sanitization',
+                category: 'Home Cleaning',
+                price: 300,
+                provider: users[1]._id,
+                description: 'Full house deep cleaning including kitchen and bathrooms.',
+                location: 'Delhi, NCR'
+            },
+            {
+                title: 'Full House Sanitization',
+                category: 'Home Cleaning',
+                price: 250,
+                provider: users[1]._id,
+                description: 'Eco-friendly house sanitization and cleaning.',
+                location: 'Delhi, NCR'
+            },
+            {
+                title: 'Professional Electrician',
+
+                category: 'Electrician',
+                price: 500,
+                provider: users[2]._id,
+                description: 'Certified electrician for all household wiring and appliance repairs.',
+                location: 'Bangalore, Karnataka'
+            }
+        ]);
+
+
+        console.log('Seeding complete with reviews and services!');
+
         process.exit(0);
     } catch (err) {
         console.error('Seeding Error:', err);

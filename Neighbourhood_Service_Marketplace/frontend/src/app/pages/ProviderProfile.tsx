@@ -13,20 +13,38 @@ export default function ProviderProfile() {
   const { id } = useParams();
   const [provider, setProvider] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const profileRes = await fetch(`/api/providers/${id}`);
+        // Try fetching by Profile ID first
+        let profileRes = await fetch(`/api/providers/${id}`);
+        
+        // If not found, try fetching by User ID
+        if (!profileRes.ok) {
+          profileRes = await fetch(`/api/providers/user/${id}`);
+        }
+        
         if (!profileRes.ok) throw new Error('Profile not found');
         const profileData = await profileRes.json();
         setProvider(profileData);
 
-        const reviewsRes = await fetch(`/api/reviews/provider/${profileData.user?._id || profileData.user}`);
+        const userId = profileData.user?._id || profileData.user;
+
+        // Fetch Reviews
+        const reviewsRes = await fetch(`/api/reviews/provider/${userId}`);
         if (reviewsRes.ok) {
           const reviewsData = await reviewsRes.json();
           setReviews(reviewsData);
+        }
+
+        // Fetch Services for this provider
+        const servicesRes = await fetch(`/api/services?provider=${userId}`);
+        if (servicesRes.ok) {
+          const servicesData = await servicesRes.json();
+          setServices(servicesData);
         }
       } catch (err) {
         console.error(err);
@@ -36,6 +54,7 @@ export default function ProviderProfile() {
     };
     fetchProfile();
   }, [id]);
+
 
   if (isLoading) {
     return (
@@ -108,12 +127,13 @@ export default function ProviderProfile() {
                   <p className="text-4xl font-black text-slate-900 dark:text-white mb-4">
                     ₹{provider.hourlyRate}<span className="text-sm font-normal text-gray-500">/hr</span>
                   </p>
-                  <Link to={`/booking/${provider._id || id}`} className="w-full md:w-auto">
-                    <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white w-full md:w-auto px-10 py-7 rounded-2xl text-lg font-bold shadow-xl shadow-blue-600/20 transition-transform active:scale-95">
+                  <Link to={`/booking/${services[0]?._id || id}`} className="w-full md:w-auto">
+                    <Button size="lg" disabled={services.length === 0} className="bg-blue-600 hover:bg-blue-700 text-white w-full md:w-auto px-10 py-7 rounded-2xl text-lg font-bold shadow-xl shadow-blue-600/20 transition-transform active:scale-95">
                       <Calendar className="h-5 w-5 mr-3" />
-                      Reserve Now
+                      {services.length > 0 ? "Book Expert Service" : "No Services Available"}
                     </Button>
                   </Link>
+
                 </div>
               </div>
 
@@ -142,9 +162,13 @@ export default function ProviderProfile() {
               <TabsTrigger value="about" className="data-[state=active]:border-blue-600 dark:data-[state=active]:text-white border-b-2 border-transparent rounded-none px-2 py-4 bg-transparent text-lg font-bold text-gray-500">
                 About The Pro
               </TabsTrigger>
+              <TabsTrigger value="services" className="data-[state=active]:border-blue-600 dark:data-[state=active]:text-white border-b-2 border-transparent rounded-none px-2 py-4 bg-transparent text-lg font-bold text-gray-500">
+                Services Offered ({services.length})
+              </TabsTrigger>
               <TabsTrigger value="reviews" className="data-[state=active]:border-blue-600 dark:data-[state=active]:text-white border-b-2 border-transparent rounded-none px-2 py-4 bg-transparent text-lg font-bold text-gray-500">
                 Client Reviews ({reviews.length})
               </TabsTrigger>
+
             </TabsList>
 
             <TabsContent value="about" className="mt-6">
@@ -182,7 +206,34 @@ export default function ProviderProfile() {
               </div>
             </TabsContent>
 
+            <TabsContent value="services" className="mt-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                {services.map((service: any) => (
+                  <Card key={service._id} className="p-6 rounded-[2rem] border-white/20 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg hover:shadow-xl transition-all group">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <Badge className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mb-2 truncate max-w-[150px]">
+                          {service.category}
+                        </Badge>
+                        <h3 className="text-xl font-black dark:text-white leading-tight">{service.title}</h3>
+                      </div>
+                      <p className="text-2xl font-black text-blue-600 dark:text-blue-400">₹{service.price}</p>
+                    </div>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 line-clamp-2 min-h-[40px]">
+                      {service.description || "High-quality professional service guaranteed to meet your needs."}
+                    </p>
+                    <Link to={`/booking/${service._id}`}>
+                      <Button className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white rounded-xl font-bold py-5">
+                        Book This Service
+                      </Button>
+                    </Link>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
             <TabsContent value="reviews">
+
               <div className="grid md:grid-cols-1 gap-6">
                 {reviews.length > 0 ? (
                   reviews.map((review: any) => (

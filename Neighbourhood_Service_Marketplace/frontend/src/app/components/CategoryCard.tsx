@@ -19,7 +19,8 @@ export default function CategoryCard({ category }: CategoryCardProps) {
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
       <Link to={`/services/${category.id}`}>
-        <div className="relative overflow-hidden cursor-pointer group rounded-3xl bg-slate-800 h-60 shadow-lg hover:shadow-2xl hover:shadow-blue-900/20 transition-shadow duration-500">
+        <div className="relative overflow-hidden cursor-pointer group rounded-[2.5rem] bg-slate-100 dark:bg-slate-900 h-64 shadow-lg hover:shadow-2xl hover:shadow-blue-600/20 dark:hover:shadow-blue-900/40 transition-all duration-500 border border-slate-200/50 dark:border-white/5">
+
           {/* Background image */}
           <img
             src={category.image}
@@ -27,8 +28,9 @@ export default function CategoryCard({ category }: CategoryCardProps) {
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
 
-          {/* Base gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 group-hover:from-black/95 group-hover:via-black/50 transition-all duration-500" />
+          {/* Base gradient overlay - dynamic based on hover */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/95 group-hover:via-black/40 transition-all duration-700" />
+
 
           {/* Pro count - top right */}
           <div className="absolute top-3 right-3 bg-white/15 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-xl">

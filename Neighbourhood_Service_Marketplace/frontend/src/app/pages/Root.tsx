@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import AIServiceAssistant from "../components/AIServiceAssistant";
 
 export default function Root() {
   return (
@@ -10,6 +11,8 @@ export default function Root() {
         <Outlet />
       </main>
       <Footer />
+      <AIServiceAssistant />
     </div>
   );
 }
+

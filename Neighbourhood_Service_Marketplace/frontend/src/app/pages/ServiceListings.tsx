@@ -9,6 +9,9 @@ import { Slider } from "../components/ui/slider";
 import { Label } from "../components/ui/label";
 import ServiceCard from "../components/ServiceCard";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
+import MapView from "../components/MapView";
+import { LayoutGrid, Map as MapIcon } from "lucide-react";
+
 
 export default function ServiceListings() {
   const { category } = useParams();
@@ -23,33 +26,38 @@ export default function ServiceListings() {
   const [locationQuery, setLocationQuery] = useState(initialLocation);
   const [sortBy, setSortBy] = useState("rating");
   const [priceRange, setPriceRange] = useState([0, 2000]);
+  const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
+
 
   useEffect(() => {
     const fetchProviders = async () => {
       setIsLoading(true);
       try {
         const url = category 
-          ? `/api/providers?category=${category}` 
-          : '/api/providers';
+          ? `/api/services?category=${category}` 
+          : '/api/services';
         const res = await fetch(url);
         const data = await res.json();
         
         // Map backend schema to UI format
         const mappedData = data.map((d: any) => ({
           id: d._id,
-          name: d.user?.name || "Premium Provider",
-          service: d.category,
+          providerId: d.provider?._id || d.provider,
+          name: d.provider?.name || "Premium Provider",
+          service: d.title,
           category: d.category.toLowerCase(),
-          rating: d.averageRating || 4.5,
-          reviews: d.totalReviews || 0,
-          price: `₹${d.hourlyRate}/hr`,
-          priceValue: d.hourlyRate,
+          rating: d.rating || 4.5,
+          reviews: d.reviews || 0,
+          price: `₹${d.price}/hr`,
+          priceValue: d.price,
           location: d.location || "Mumbai, Maharashtra",
-          image: `https://images.unsplash.com/photo-1581578731548-c64695ce6952?auto=format&fit=crop&q=80&w=400`,
+          image: d.image || `https://images.unsplash.com/photo-1581578731548-c64695ce6952?auto=format&fit=crop&q=80&w=400`,
           verified: true,
           experience: "Expert"
         }));
+
         setAllProviders(mappedData);
+
       } catch (err) {
         console.error("Failed to fetch providers:", err);
       } finally {
@@ -168,10 +176,27 @@ export default function ServiceListings() {
               Discover top-rated professionals in your neighborhood, verified for quality and reliability.
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-900 px-6 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm inline-flex items-center">
-            <span className="text-2xl font-black text-blue-600 dark:text-blue-400 mr-2">{filteredProviders.length}</span>
-            <span className="text-slate-500 dark:text-slate-400 font-bold uppercase text-xs tracking-widest">Experts Available</span>
+          <div className="flex items-center gap-4">
+            <div className="bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center">
+              <button 
+                onClick={() => setViewMode("grid")}
+                className={`p-2.5 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-400 hover:text-slate-600'}`}
+              >
+                <LayoutGrid className="h-5 w-5" />
+              </button>
+              <button 
+                onClick={() => setViewMode("map")}
+                className={`p-2.5 rounded-xl transition-all ${viewMode === 'map' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-400 hover:text-slate-600'}`}
+              >
+                <MapIcon className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="bg-white dark:bg-slate-900 px-6 py-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm inline-flex items-center">
+              <span className="text-2xl font-black text-blue-600 dark:text-blue-400 mr-2">{filteredProviders.length}</span>
+              <span className="text-slate-500 dark:text-slate-400 font-bold uppercase text-xs tracking-widest">Experts Available</span>
+            </div>
           </div>
+
         </motion.div>
 
         <div className="grid lg:grid-cols-4 gap-8">
@@ -231,7 +256,7 @@ export default function ServiceListings() {
               </Sheet>
             </div>
 
-            {/* Provider Grid */}
+            {/* Provider Grid or Map */}
             <AnimatePresence mode="wait">
               {isLoading ? (
                 <motion.div 
@@ -246,16 +271,29 @@ export default function ServiceListings() {
                   ))}
                 </motion.div>
               ) : filteredProviders.length > 0 ? (
-                <motion.div 
-                  key="grid"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="grid md:grid-cols-2 gap-8"
-                >
-                  {filteredProviders.map((provider) => (
-                    <ServiceCard key={provider.id} provider={provider} />
-                  ))}
-                </motion.div>
+                viewMode === "grid" ? (
+                  <motion.div 
+                    key="grid"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="grid md:grid-cols-2 gap-8"
+                  >
+                    {filteredProviders.map((provider) => (
+                      <ServiceCard key={provider.id} provider={provider} />
+                    ))}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="map"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="h-[600px] w-full"
+                  >
+                    <MapView providers={filteredProviders} />
+                  </motion.div>
+                )
               ) : (
                 <motion.div 
                   key="empty"
@@ -284,6 +322,7 @@ export default function ServiceListings() {
                 </motion.div>
               )}
             </AnimatePresence>
+
           </div>
         </div>
       </div>

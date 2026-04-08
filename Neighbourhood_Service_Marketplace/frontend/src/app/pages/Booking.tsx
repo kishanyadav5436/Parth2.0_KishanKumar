@@ -22,11 +22,11 @@ const timeSlots = [
 ];
 
 export default function Booking() {
-  const { providerId } = useParams();
+  const { providerId: serviceId } = useParams();
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAppContext();
 
-  const [provider, setProvider] = useState<any>(null);
+  const [service, setService] = useState<any>(null);
   const [date, setDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -53,23 +53,23 @@ export default function Booking() {
     }
   }, [user]);
 
-  // Fetch provider details
+  // Fetch service details
   useEffect(() => {
-    const fetchProvider = async () => {
+    const fetchService = async () => {
       try {
-        const res = await fetch(`/api/providers/${providerId}`, { credentials: 'include' });
-        if (!res.ok) throw new Error("Provider not found");
+        const res = await fetch(`/api/services/${serviceId}`, { credentials: 'include' });
+        if (!res.ok) throw new Error("Service not found");
         const data = await res.json();
-        setProvider(data);
+        setService(data);
       } catch (err) {
         console.error(err);
-        setError("Could not load provider details.");
+        setError("Could not load service details.");
       } finally {
         setIsLoading(false);
       }
     };
-    if (providerId) fetchProvider();
-  }, [providerId]);
+    if (serviceId) fetchService();
+  }, [serviceId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +77,7 @@ export default function Booking() {
 
     // Auth gate — redirect to login if not logged in
     if (!user) {
-      navigate(`/auth?redirect=/booking/${providerId}`);
+      navigate(`/auth?redirect=/booking/${serviceId}`);
       return;
     }
 
@@ -90,10 +90,10 @@ export default function Booking() {
     try {
       const response = await fetch('/api/bookings', {
         method: 'POST',
-        credentials: 'include',           // ← sends the auth cookie
+        credentials: 'include',           
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          providerId,
+          serviceId,
           date: format(date, "yyyy-MM-dd"),
           timeSlot: selectedTime,
           description: formData.message,
@@ -109,10 +109,11 @@ export default function Booking() {
         setTimeout(() => navigate('/'), 3500);
       } else if (response.status === 401) {
         setError("You must be logged in to book a service.");
-        setTimeout(() => navigate(`/auth?redirect=/booking/${providerId}`), 1500);
+        setTimeout(() => navigate(`/auth?redirect=/booking/${serviceId}`), 1500);
       } else {
         setError(data.message || "Booking failed. Please try again.");
       }
+
     } catch (err) {
       setError("Network error. Please check your connection and try again.");
     } finally {
@@ -152,8 +153,9 @@ export default function Booking() {
           </motion.div>
           <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Booking Confirmed!</h2>
           <p className="text-slate-500 dark:text-slate-400 text-lg mb-3">
-            Your request has been sent to <span className="font-bold text-slate-900 dark:text-white">{provider?.user?.name || "the expert"}</span>.
+            Your request has been sent to <span className="font-bold text-slate-900 dark:text-white">{service?.provider?.name || "the expert"}</span>.
           </p>
+
           <p className="text-slate-400 dark:text-slate-500 mb-8 text-sm font-medium">
             They will contact you at <span className="text-blue-600">{formData.phone}</span> to confirm the appointment.
           </p>
@@ -182,26 +184,58 @@ export default function Booking() {
           <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">
             You need to be logged in to book a service. It only takes 30 seconds.
           </p>
-          <Link to={`/auth?redirect=/booking/${providerId}`}>
+          <Link to={`/auth?redirect=/booking/${serviceId}`}>
             <Button size="lg" className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-lg shadow-lg shadow-blue-600/20">
               Sign In / Register
             </Button>
           </Link>
-          <Link to={`/provider/${providerId}`} className="block mt-4 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium text-sm">
-            ← Back to Provider Profile
+          <Link to={`/`} className="block mt-4 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium text-sm">
+            ← Back to Home
           </Link>
         </motion.div>
       </div>
     );
   }
 
+  // Self-booking prevention
+  const isSelfBooking = user?._id === service?.provider?._id || user?.id === service?.provider?._id;
+  if (isSelfBooking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white dark:bg-slate-900 p-12 rounded-[3rem] text-center max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-800"
+        >
+          <div className="w-20 h-20 bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="h-10 w-10 text-rose-600 dark:text-rose-400" />
+          </div>
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">Booking Restricted</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium leading-relaxed">
+            You cannot book your own service. To manage your listings, please visit your provider dashboard.
+          </p>
+          <Link to="/bookings">
+            <Button size="lg" className="w-full h-14 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black text-lg">
+              Go to Dashboard
+            </Button>
+          </Link>
+          <button onClick={() => navigate(-1)} className="block mt-4 w-full text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-bold text-sm">
+            Go Back
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500 pb-20">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-12">
-        <Link to={`/provider/${providerId}`} className="inline-flex items-center text-sm font-bold text-blue-600 dark:text-blue-400 hover:gap-2 transition-all mb-10 group">
+        <Link to={`/services`} className="inline-flex items-center text-sm font-bold text-blue-600 dark:text-blue-400 hover:gap-2 transition-all mb-10 group">
           <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          BACK TO PROFILE
+          BACK TO SERVICES
         </Link>
+
 
         <div className="grid lg:grid-cols-3 gap-8 xl:gap-12">
           {/* ── BOOKING FORM ── */}
@@ -357,8 +391,9 @@ export default function Booking() {
                     <ShieldCheck className="h-28 w-28" />
                   </div>
                   <p className="text-blue-200 text-xs font-black uppercase tracking-widest mb-1">Booking Summary</p>
-                  <h2 className="text-2xl font-black tracking-tight">{provider?.user?.name || "Expert"}</h2>
-                  <p className="text-blue-200 font-semibold text-sm mt-0.5">{provider?.category || "Service"}</p>
+                  <h2 className="text-2xl font-black tracking-tight">{service?.provider?.name || "Expert"}</h2>
+                  <p className="text-blue-200 font-semibold text-sm mt-0.5">{service?.title || "Service"}</p>
+
                 </div>
 
                 {/* Details */}
@@ -382,9 +417,10 @@ export default function Booking() {
 
                   {/* Rate */}
                   <div className="flex items-center justify-between pt-2">
-                    <span className="font-bold text-slate-500 dark:text-slate-400 text-sm">Hourly Rate</span>
-                    <span className="text-2xl font-black text-blue-600 dark:text-blue-400">₹{provider?.hourlyRate || 0}</span>
+                    <span className="font-bold text-slate-500 dark:text-slate-400 text-sm">Service Price</span>
+                    <span className="text-2xl font-black text-blue-600 dark:text-blue-400">₹{service?.price || 0}</span>
                   </div>
+
                 </div>
 
                 {/* Safety note */}

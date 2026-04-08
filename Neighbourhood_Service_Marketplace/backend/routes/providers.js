@@ -28,6 +28,18 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// Get a specific provider by User ID
+router.get('/user/:userId', async (req, res) => {
+    try {
+        const profile = await ProviderProfile.findOne({ user: req.params.userId }).populate('user', 'name email');
+        if (!profile) return res.status(404).json({ message: 'Profile not found' });
+        res.json(profile);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
+
 // Create or update provider profile (Protected, Provider Only)
 router.post('/profile', verifyToken, isProvider, async (req, res) => {
     try {

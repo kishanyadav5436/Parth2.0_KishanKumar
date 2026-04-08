@@ -257,8 +257,9 @@ export default function Auth() {
                   <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase font-black tracking-widest text-slate-400">
-                  <span className="px-4 bg-white dark:bg-slate-900 rounded-full">Or Social Sign In</span>
+                  <span className="px-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-full">Or Social Sign In</span>
                 </div>
+
               </div>
 
               <div className="grid grid-cols-2 gap-4">

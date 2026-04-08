@@ -8,6 +8,8 @@ const authRoutes = require('./routes/auth');
 const providerRoutes = require('./routes/providers');
 const bookingRoutes = require('./routes/bookings');
 const reviewRoutes = require('./routes/reviews');
+const serviceRoutes = require('./routes/services');
+
 
 dotenv.config();
 connectDB();
@@ -23,6 +25,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/providers', providerRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/services', serviceRoutes);
+
 app.get('/api/ping', (req, res) => res.json({ message: 'pong' }));
 
 // Global error handler

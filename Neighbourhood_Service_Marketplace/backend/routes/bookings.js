@@ -7,34 +7,29 @@ const { verifyToken } = require('../middleware/auth');
 // Create a new booking — requires auth cookie
 router.post('/', verifyToken, async (req, res) => {
     try {
-        const { providerId, date, timeSlot, description, phone, address, message } = req.body;
+        const { serviceId, date, timeSlot, description, phone, address } = req.body;
 
-        if (!providerId) return res.status(400).json({ message: 'Provider ID is required' });
+        if (!serviceId) return res.status(400).json({ message: 'Service ID is required' });
         if (!date) return res.status(400).json({ message: 'Date is required' });
 
-        // providerId may be a ProviderProfile _id — resolve to the user _id
-        let providerUserId = providerId;
-        try {
-            const profile = await ProviderProfile.findById(providerId);
-            if (profile) {
-                providerUserId = profile.user; // actual User ObjectId
-            }
-        } catch (e) {
-            // If lookup fails, assume providerId is already a user _id
-        }
+        const Service = require('../model/service');
+        const service = await Service.findById(serviceId);
+        if (!service) return res.status(404).json({ message: 'Service not found' });
 
         const newBooking = new Booking({
             customer: req.user.id,
-            provider: providerUserId,
+            provider: service.provider,
+            service: serviceId,
             date: new Date(date),
             timeSlot: timeSlot || '',
-            description: description || message || '',
+            description: description || '',
             phone: phone || '',
             address: address || ''
         });
 
         await newBooking.save();
         res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
+
     } catch (err) {
         console.error('Booking Error:', err);
         res.status(500).json({ message: 'Server error', error: err.message });
@@ -52,6 +47,8 @@ router.get('/', verifyToken, async (req, res) => {
         })
         .populate('customer', 'name email')
         .populate('provider', 'name email')
+        .populate('service')
+
         .sort({ createdAt: -1 });
 
         res.json(bookings);

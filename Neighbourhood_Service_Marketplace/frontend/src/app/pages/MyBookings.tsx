@@ -17,7 +17,9 @@ interface Booking {
   _id: string;
   provider: { _id: string; name: string; email: string };
   customer: { _id: string; name: string; email: string };
+  service: { _id: string; title: string; category: string; price: number };
   date: string;
+
   timeSlot: string;
   description: string;
   phone: string;
@@ -283,8 +285,9 @@ export default function MyBookings() {
                               {isProvider ? "Customer" : "Service Provider"}
                             </p>
                             <h3 className="text-lg font-black text-slate-900 dark:text-white">
-                              {otherParty?.name || "Unknown"}
+                              {booking.service?.title || booking.provider?.name || "Unknown Service"}
                             </h3>
+
                             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
                               {otherParty?.email || ""}
                             </p>
@@ -316,15 +319,65 @@ export default function MyBookings() {
                         ))}
                       </div>
 
+                      {/* Status Progress Tracker */}
+                      <div className="mb-8 mt-2 px-2">
+                        <div className="flex justify-between items-center relative">
+                          {/* Background Line */}
+                          <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 dark:bg-slate-800 -translate-y-1/2 z-0" />
+                          
+                          {/* Active Line (only for accepted/completed) */}
+                          {(booking.status === 'accepted' || booking.status === 'completed') && (
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: booking.status === 'completed' ? '100%' : '50%' }}
+                              className="absolute top-1/2 left-0 h-0.5 bg-blue-600 -translate-y-1/2 z-0"
+                            />
+                          )}
+
+                          {[
+                            { id: "pending", icon: Clock, label: "Booking Placed" },
+                            { id: "accepted", icon: Package, label: "Confirmed" },
+                            { id: "completed", icon: CheckCircle2, label: "Finished" },
+                          ].map((step, idx) => {
+                            const isPast = (booking.status === 'accepted' && (step.id === 'pending')) || 
+                                          (booking.status === 'completed' && (step.id === 'pending' || step.id === 'accepted'));
+                            const isCurrent = booking.status === step.id;
+                            const isCancelled = booking.status === 'rejected';
+
+                            return (
+                              <div key={step.id} className="relative z-10 flex flex-col items-center">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center border-4 ${
+                                  isCancelled && isCurrent ? 'bg-rose-500 border-white dark:border-slate-900 text-white shadow-lg shadow-rose-500/20' :
+                                  isPast || isCurrent ? 'bg-blue-600 border-white dark:border-slate-900 text-white shadow-xl shadow-blue-600/30' : 
+                                  'bg-slate-100 dark:bg-slate-800 border-white dark:border-slate-950 text-slate-400 dark:text-slate-600'
+                                } transition-all duration-500`}>
+                                  <step.icon className={`h-5 w-5 ${isCurrent ? 'animate-pulse' : ''}`} />
+                                </div>
+                                <div className="absolute -bottom-7 whitespace-nowrap">
+                                  <span className={`text-[11px] font-black uppercase tracking-tight ${
+                                    isCancelled && isCurrent ? 'text-rose-500' :
+                                    isPast || isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'
+                                  }`}>
+                                    {step.label}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+
+                        </div>
+                      </div>
+
                       {/* Description */}
                       {booking.description && (
-                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mb-5 border border-blue-100 dark:border-blue-900">
-                          <p className="text-xs font-black text-blue-400 uppercase tracking-widest mb-1">Job Description</p>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 mb-5 border border-slate-100 dark:border-slate-800">
+                          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Job Description</p>
                           <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">
                             {booking.description}
                           </p>
                         </div>
                       )}
+
 
                       {/* Actions row */}
                       <div className="flex items-center justify-between gap-3 flex-wrap">

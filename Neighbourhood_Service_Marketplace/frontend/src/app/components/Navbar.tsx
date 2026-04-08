@@ -168,14 +168,17 @@ export default function Navbar() {
               )}
               {user ? (
                 <>
-                  <Link to="/bookings" className="px-4 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                My Bookings
-              </Link>
-              <Link to="/settings" className="px-4 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                    Settings
+                  <Link to="/bookings" className="px-4 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+                    <BookOpen className="h-4 w-4 mr-2 text-slate-400" /> My Bookings
                   </Link>
-                  <button className="text-left px-4 py-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-semibold transition-colors">
-                    Sign Out
+                  <Link to="/settings" className="px-4 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Settings className="h-4 w-4 mr-2 text-slate-400" /> Settings
+                  </Link>
+                  <button 
+                    onClick={() => { setIsMobileMenuOpen(false); /* logout logic here */ }}
+                    className="text-left w-full px-4 py-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-semibold transition-colors flex items-center"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" /> Sign Out
                   </button>
                 </>
               ) : (
@@ -183,6 +186,7 @@ export default function Navbar() {
                   Sign In
                 </Link>
               )}
+
             </div>
           </div>
         )}
