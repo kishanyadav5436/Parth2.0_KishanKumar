@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Home, Mail, Phone, MapPin, Github, Twitter, Instagram, Linkedin, ArrowRight, Heart, Shield, Star, Zap } from "lucide-react";
 
 const footerLinks = {
@@ -11,20 +11,21 @@ const footerLinks = {
     { label: "Gardening", to: "/services/gardening" },
   ],
   Company: [
-    { label: "About Us", to: "/" },
-    { label: "How It Works", to: "/#how-it-works" },
+    { label: "About Us", to: "/services" },
+    { label: "How It Works", to: "/services", anchor: "how-it-works" },
     { label: "Become a Provider", to: "/auth?role=provider" },
     { label: "Browse All", to: "/services" },
     { label: "Sign In", to: "/auth" },
   ],
   Support: [
-    { label: "Help Center", to: "/" },
-    { label: "Safety Tips", to: "/" },
-    { label: "Privacy Policy", to: "/" },
-    { label: "Terms of Service", to: "/" },
-    { label: "Contact Us", to: "/" },
+    { label: "Help Center", to: "/auth" },
+    { label: "Safety Tips", to: "/services" },
+    { label: "Privacy Policy", to: "/auth" },
+    { label: "Terms of Service", to: "/auth" },
+    { label: "Contact Us", to: "/auth" },
   ],
 };
+
 
 const socialLinks = [
   { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
@@ -41,6 +42,19 @@ const stats = [
 ];
 
 export default function Footer() {
+  const navigate = useNavigate();
+
+  const handleNavClick = (to: string, anchor?: string) => {
+    navigate(to);
+    if (anchor) {
+      // Allow time for the page to render before scrolling to anchor
+      setTimeout(() => {
+        const el = document.getElementById(anchor);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+    }
+  };
+
   return (
     <footer className="bg-slate-50 dark:bg-black text-slate-900 dark:text-white relative overflow-hidden transition-colors duration-500 border-t border-slate-200 dark:border-white/5">
       {/* Background decoration */}
@@ -123,13 +137,13 @@ export default function Footer() {
               <ul className="space-y-4">
                 {links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      to={link.to}
-                      className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-bold transition-all flex items-center group"
+                    <button
+                      onClick={() => handleNavClick(link.to, (link as any).anchor)}
+                      className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-bold transition-all flex items-center group cursor-pointer bg-transparent border-none p-0"
                     >
                       <ArrowRight className="h-3 w-3 mr-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all font-black" />
                       {link.label}
-                    </Link>
+                    </button>
                   </li>
                 ))}
               </ul>
