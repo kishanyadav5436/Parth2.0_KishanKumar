@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../c
 import MapView from "../components/MapView";
 import { LayoutGrid, Map as MapIcon } from "lucide-react";
 import { MOCK_PROVIDERS, getMockProviders } from "../data/mockData";
+import { API_BASE_URL } from "../config";
 
 export default function ServiceListings() {
   const { category } = useParams();
@@ -34,8 +35,8 @@ export default function ServiceListings() {
       setIsLoading(true);
       try {
         const url = category 
-          ? `/api/services?category=${category}` 
-          : '/api/services';
+          ? `${API_BASE_URL}/api/services?category=${category}` 
+          : `${API_BASE_URL}/api/services`;
         const res = await fetch(url);
         const data = await res.json();
         
@@ -58,19 +59,26 @@ export default function ServiceListings() {
 
         // Map backend schema to UI format
         const mappedData = data.map((d: any) => {
-          const cat = d.category?.toLowerCase() || "";
+          const cat = d.category?.toLowerCase().replace(/\s+/g, '-') || "";
+          
+          let finalImage = d.image;
+          // Ignore backend default cleaning image to favor category specific images
+          if (!finalImage || finalImage.includes('1581578731548-c64695ce6952')) {
+              finalImage = defaultImages[cat] || "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=400&q=80";
+          }
+
           return {
             id: d._id,
             providerId: d.provider?._id || d.provider,
             name: d.provider?.name || "Premium Provider",
             service: d.title,
-            category: cat,
+            category: d.category || cat,
             rating: d.rating || 4.5,
             reviews: d.reviews || 0,
             price: `₹${d.price}/hr`,
             priceValue: d.price,
             location: d.location || "Mumbai, Maharashtra",
-            image: d.image || defaultImages[cat] || "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=400&q=80",
+            image: finalImage,
             verified: true,
             experience: "Expert"
           };
@@ -97,15 +105,19 @@ export default function ServiceListings() {
 
   const filteredProviders = allProviders
     .filter((provider) => {
-      const matchesSearch = !searchQuery || 
-        provider.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        provider.service.toLowerCase().includes(searchQuery.toLowerCase());
+      const query = searchQuery ? searchQuery.toLowerCase() : "";
+      const matchesSearch = !query || 
+        (provider.name && provider.name.toLowerCase().includes(query)) ||
+        (provider.service && provider.service.toLowerCase().includes(query)) ||
+        (provider.category && provider.category.toLowerCase().includes(query));
       
-      const matchesLocation = !locationQuery || 
-        provider.location.toLowerCase().includes(locationQuery.toLowerCase());
+      const loc = locationQuery ? locationQuery.toLowerCase() : "";
+      const matchesLocation = !loc || 
+        (provider.location && provider.location.toLowerCase().includes(loc));
 
       if (!matchesSearch || !matchesLocation) return false;
-      if (provider.priceValue < priceRange[0] || provider.priceValue > priceRange[1]) return false;
+      const pValue = provider.priceValue || 0;
+      if (pValue < priceRange[0] || pValue > priceRange[1]) return false;
       return true;
     })
     .sort((a, b) => {

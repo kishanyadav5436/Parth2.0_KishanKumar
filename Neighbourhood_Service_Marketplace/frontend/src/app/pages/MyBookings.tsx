@@ -425,7 +425,7 @@ export default function MyBookings() {
                               size="sm"
                               className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl h-9 px-4 text-xs gap-1"
                               onClick={async () => {
-                                const res = await fetch(`/api/bookings/${booking._id}/status`, {
+                                const res = await fetch(`${API_BASE_URL}/api/bookings/${booking._id}/status`, {
                                   method: "PATCH", credentials: "include",
                                   headers: { "Content-Type": "application/json" },
                                   body: JSON.stringify({ status: "completed" }),
