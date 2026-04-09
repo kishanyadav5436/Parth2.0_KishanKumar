@@ -12,17 +12,17 @@ const footerLinks = {
   ],
   Company: [
     { label: "About Us", to: "/services" },
-    { label: "How It Works", to: "/services", anchor: "how-it-works" },
+    { label: "How It Works", to: "/services" },
     { label: "Become a Provider", to: "/auth?role=provider" },
     { label: "Browse All", to: "/services" },
     { label: "Sign In", to: "/auth" },
   ],
   Support: [
-    { label: "Help Center", to: "/auth" },
-    { label: "Safety Tips", to: "/services" },
-    { label: "Privacy Policy", to: "/auth" },
-    { label: "Terms of Service", to: "/auth" },
-    { label: "Contact Us", to: "/auth" },
+    { label: "Help Center", to: "/support?tab=help" },
+    { label: "Safety Tips", to: "/support?tab=safety" },
+    { label: "Privacy Policy", to: "/support?tab=privacy" },
+    { label: "Terms of Service", to: "/support?tab=terms" },
+    { label: "Contact Us", to: "/support?tab=contact" },
   ],
 };
 

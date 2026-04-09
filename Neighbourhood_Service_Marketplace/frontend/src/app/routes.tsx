@@ -8,6 +8,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Settings from "./pages/Settings";
 import MyBookings from "./pages/MyBookings";
+import Support from "./pages/Support";
 
 export const router = createBrowserRouter([
   {
@@ -22,7 +23,9 @@ export const router = createBrowserRouter([
       { path: "bookings", Component: MyBookings },
       { path: "auth", Component: Auth },
       { path: "settings", Component: Settings },
+      { path: "support", Component: Support },
       { path: "*", Component: NotFound },
     ],
   },
 ]);
+
