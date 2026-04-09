@@ -14,14 +14,14 @@ import { API_BASE_URL } from "../config";
 import { getMockProviders } from "../data/mockData";
 
 const categories = [
-  { id: "ac-repair", name: "AC Repair", icon: "❄️", image: "https://images.unsplash.com/photo-1630481721508-5d37097dd8fc?auto=format&fit=crop&q=80&w=400", providers: 68 },
+  { id: "ac-repair", name: "AC Repair", icon: "❄️", image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=400", providers: 68 },
   { id: "plumbing", name: "Plumbing", icon: "🔧", image: "https://images.unsplash.com/photo-1620253610989-3ab05e06030c?auto=format&fit=crop&q=80&w=400", providers: 92 },
-  { id: "electrical", name: "Electrician", icon: "⚡", image: "https://images.unsplash.com/photo-1626501244050-ad05a356bb27?auto=format&fit=crop&q=80&w=400", providers: 84 },
-  { id: "cleaning", name: "Home Cleaning", icon: "🧹", image: "https://images.unsplash.com/photo-1775178120132-f0ff7fd5cb40?auto=format&fit=crop&q=80&w=400", providers: 156 },
-  { id: "painting", name: "Painting", icon: "🎨", image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&q=80&w=400", providers: 45 },
-  { id: "gardening", name: "Gardening", icon: "🌱", image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=400", providers: 32 },
-  { id: "beauty", name: "Beauty & Wellness", icon: "💄", image: "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?auto=format&fit=crop&q=80&w=400", providers: 110 },
-  { id: "pest-control", name: "Pest Control", icon: "🐜", image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=400", providers: 28 },
+  { id: "electrical", name: "Electrician", icon: "⚡", image: "https://images.unsplash.com/photo-1626501244050-ad05a356bb27?auto=format&w=400&q=80", providers: 84 },
+  { id: "cleaning", name: "Home Cleaning", icon: "🧹", image: "https://images.unsplash.com/photo-1581578731548-c64695ce6952?auto=format&fit=crop&w=400&q=80", providers: 156 },
+  { id: "painting", name: "Painting", icon: "🎨", image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=400&q=80", providers: 45 },
+  { id: "gardening", name: "Gardening", icon: "🌱", image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80", providers: 32 },
+  { id: "beauty", name: "Beauty & Wellness", icon: "💄", image: "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?auto=format&fit=crop&w=400&q=80", providers: 110 },
+  { id: "pest-control", name: "Pest Control", icon: "🐜", image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=400&q=80", providers: 28 },
 ];
 
 const locations = [
@@ -31,9 +31,9 @@ const locations = [
 ];
 
 const testimonials = [
-  { name: "Priya Sharma", role: "Homeowner, Mumbai", text: "Found an amazing AC technician within minutes. Professional, on-time, and very affordable. Will definitely use ServiceHub again!", rating: 5, avatar: "P" },
-  { name: "Rohit Mehta", role: "Apartment Owner, Delhi", text: "The plumber came within 2 hours of booking. Fixed the leak perfectly. The whole experience was seamless!",rating: 5, avatar: "R" },
-  { name: "Ananya Nair", role: "Working Professional, Bangalore", text: "Home cleaning service exceeded all expectations. The team was thorough and left my home spotless. Highly recommend!", rating: 5, avatar: "A" },
+  { name: "Priya Sharma", role: "Homeowner, Mumbai", text: "Found an amazing AC technician within minutes. Professional, on-time, and very affordable. Will definitely use ServiceHub again!", rating: 5, avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" },
+  { name: "Rohit Mehta", role: "Apartment Owner, Delhi", text: "The plumber came within 2 hours of booking. Fixed the leak perfectly. The whole experience was seamless!",rating: 5, avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" },
+  { name: "Ananya Nair", role: "Working Professional, Bangalore", text: "Home cleaning service exceeded all expectations. The team was thorough and left my home spotless. Highly recommend!", rating: 5, avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&q=80" },
 ];
 
 // Animated counter hook
@@ -99,10 +99,11 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    setIsLoading(true);
     fetch(`${API_BASE_URL}/api/services`)
       .then(res => res.json())
       .then(data => {
-        if (!data || data.length === 0) {
+        if (!Array.isArray(data) || data.length === 0) {
           // Fallback to top 3 mock providers
           setFeaturedProviders(getMockProviders().slice(0, 3));
           return;
@@ -505,8 +506,12 @@ export default function Home() {
                 <p className="text-slate-700 dark:text-slate-300 font-medium leading-relaxed mb-6">"{t.text}"</p>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-black text-lg">
-                      {t.avatar}
+                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-black text-lg overflow-hidden shrink-0 shadow-inner">
+                      {t.avatar.startsWith('http') ? (
+                        <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
+                      ) : (
+                        t.avatar
+                      )}
                     </div>
                     <div>
                       <p className="font-black text-slate-900 dark:text-white text-sm">{t.name}</p>

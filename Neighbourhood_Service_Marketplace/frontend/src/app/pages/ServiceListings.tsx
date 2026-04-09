@@ -39,22 +39,42 @@ export default function ServiceListings() {
         const res = await fetch(url);
         const data = await res.json();
         
+        if (!Array.isArray(data)) {
+          setAllProviders(getMockProviders(category));
+          setIsLoading(false);
+          return;
+        }
+
+        const defaultImages: Record<string, string> = {
+          "ac-repair": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=400&q=80",
+          "plumbing": "https://images.unsplash.com/photo-1620253610989-3ab05e06030c?auto=format&fit=crop&w=400&q=80",
+          "electrical": "https://images.unsplash.com/photo-1626501244050-ad05a356bb27?auto=format&fit=crop&w=400&q=80",
+          "cleaning": "https://images.unsplash.com/photo-1581578731548-c64695ce6952?auto=format&fit=crop&w=400&q=80",
+          "painting": "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=400&q=80",
+          "gardening": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80",
+          "beauty": "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?auto=format&fit=crop&w=400&q=80",
+          "pest-control": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=400&q=80"
+        };
+
         // Map backend schema to UI format
-        const mappedData = data.map((d: any) => ({
-          id: d._id,
-          providerId: d.provider?._id || d.provider,
-          name: d.provider?.name || "Premium Provider",
-          service: d.title,
-          category: d.category.toLowerCase(),
-          rating: d.rating || 4.5,
-          reviews: d.reviews || 0,
-          price: `₹${d.price}/hr`,
-          priceValue: d.price,
-          location: d.location || "Mumbai, Maharashtra",
-          image: d.image || "",
-          verified: true,
-          experience: "Expert"
-        }));
+        const mappedData = data.map((d: any) => {
+          const cat = d.category?.toLowerCase() || "";
+          return {
+            id: d._id,
+            providerId: d.provider?._id || d.provider,
+            name: d.provider?.name || "Premium Provider",
+            service: d.title,
+            category: cat,
+            rating: d.rating || 4.5,
+            reviews: d.reviews || 0,
+            price: `₹${d.price}/hr`,
+            priceValue: d.price,
+            location: d.location || "Mumbai, Maharashtra",
+            image: d.image || defaultImages[cat] || "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=400&q=80",
+            verified: true,
+            experience: "Expert"
+          };
+        });
 
         // Use real data if available, otherwise fall back to mock data
         if (mappedData.length > 0) {
