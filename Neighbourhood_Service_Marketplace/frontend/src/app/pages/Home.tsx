@@ -176,8 +176,8 @@ export default function Home() {
               transition={{ delay: 0.4, duration: 0.6 }}
               className="max-w-4xl mx-auto"
             >
-              <div className="glass-card rounded-2xl p-2 flex flex-col md:flex-row gap-2">
-                <div className="flex-[2] flex items-center px-4 gap-3">
+              <div className="glass-card rounded-2xl p-2 flex flex-col md:flex-row gap-2 relative">
+                <div className="flex-[2] flex items-center px-4 gap-3 relative">
                   <Search className="h-5 w-5 text-white/60 shrink-0" />
                   <Input
                     placeholder="What service do you need?"
@@ -186,6 +186,52 @@ export default function Home() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   />
+                  
+                  {/* Live Suggestions Dropdown */}
+                  {searchQuery.trim().length > 0 && (
+                    <div className="absolute top-[120%] left-0 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 text-left">
+                      {(() => {
+                        const suggestions = categories.filter(c => {
+                          const q = searchQuery.toLowerCase();
+                          const n = c.name.toLowerCase();
+                          return n.includes(q) || 
+                                 (q.includes('plumb') && n.includes('plumb')) ||
+                                 (q.includes('clean') && n.includes('clean')) ||
+                                 (q.includes('electric') && n.includes('electric')) ||
+                                 (q.includes('paint') && n.includes('paint')) ||
+                                 (q.includes('garden') && n.includes('garden')) ||
+                                 (q.includes('ac') && n.includes('ac'));
+                        });
+                        
+                        return (
+                          <>
+                            {suggestions.map((cat, i) => (
+                              <button
+                                key={i}
+                                onClick={() => {
+                                  setSearchQuery(cat.name);
+                                  navigate(`/services?category=${cat.id}`);
+                                }}
+                                className="w-full text-left px-4 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors flex items-center gap-3 border-b border-slate-100 dark:border-slate-800/50 last:border-0 group"
+                              >
+                                <span className="text-xl group-hover:scale-110 transition-transform">{cat.icon}</span>
+                                <span className="font-bold text-slate-700 dark:text-slate-300">{cat.name}</span>
+                              </button>
+                            ))}
+                            {suggestions.length === 0 && (
+                              <button
+                                onClick={handleSearch}
+                                className="w-full text-left px-4 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors flex items-center gap-3 text-slate-500 dark:text-slate-400 font-medium group"
+                              >
+                                <Search className="h-4 w-4 text-blue-500 group-hover:scale-110 transition-transform" />
+                                Search everywhere for "<span className="font-bold text-slate-700 dark:text-slate-200">{searchQuery}</span>"
+                              </button>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </div>
                 <div className="h-px md:h-auto md:w-px bg-white/20 mx-2" />
                 <div className="flex-1 flex items-center px-4 gap-3">

@@ -103,13 +103,33 @@ export default function ServiceListings() {
     fetchProviders();
   }, [category]);
 
+  const normalizeText = (str: string) => {
+    let s = str.toLowerCase();
+    const synonyms: Record<string, string> = {
+      'plumber': 'plumb', 'plumbing': 'plumb',
+      'cleaner': 'clean', 'cleaning': 'clean',
+      'electrician': 'electric', 'electrical': 'electric',
+      'painter': 'paint', 'painting': 'paint',
+      'gardener': 'garden', 'gardening': 'garden',
+    };
+    Object.keys(synonyms).forEach(key => {
+      s = s.replace(new RegExp(key, 'g'), synonyms[key]);
+    });
+    return s;
+  };
+
   const filteredProviders = allProviders
     .filter((provider) => {
-      const query = searchQuery ? searchQuery.toLowerCase() : "";
+      const query = searchQuery ? normalizeText(searchQuery) : "";
+      
+      const pName = provider.name ? normalizeText(provider.name) : "";
+      const pService = provider.service ? normalizeText(provider.service) : "";
+      const pCategory = provider.category ? normalizeText(provider.category) : "";
+
       const matchesSearch = !query || 
-        (provider.name && provider.name.toLowerCase().includes(query)) ||
-        (provider.service && provider.service.toLowerCase().includes(query)) ||
-        (provider.category && provider.category.toLowerCase().includes(query));
+        pName.includes(query) ||
+        pService.includes(query) ||
+        pCategory.includes(query);
       
       const loc = locationQuery ? locationQuery.toLowerCase() : "";
       const matchesLocation = !loc || 
