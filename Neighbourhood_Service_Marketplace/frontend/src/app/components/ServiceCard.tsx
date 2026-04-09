@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, MapPin, ShieldCheck, ArrowRight, Clock } from "lucide-react";
+import { Star, MapPin, ShieldCheck, ArrowRight, Clock, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -21,6 +22,8 @@ interface ServiceCardProps {
 }
 
 export default function ServiceCard({ provider }: ServiceCardProps) {
+  const [imgError, setImgError] = useState(false);
+
   return (
     <motion.div
       whileHover={{ y: -8, scale: 1.01 }}
@@ -29,14 +32,23 @@ export default function ServiceCard({ provider }: ServiceCardProps) {
     >
       <div className="relative group h-full bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-black/40 hover:shadow-2xl hover:shadow-blue-600/10 dark:hover:shadow-blue-900/20 transition-all duration-500 flex flex-col border border-slate-100 dark:border-white/5">
 
-
         {/* Image area */}
-        <div className="relative h-52 overflow-hidden">
-          <img
-            src={provider.image}
-            alt={provider.name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
+        <div className="relative h-52 overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-700">
+          {!imgError && provider.image ? (
+            <img
+              src={provider.image}
+              alt={provider.name}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            /* Fallback avatar when image fails or is missing */
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="h-20 w-20 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center shadow-lg">
+                <User className="h-10 w-10 text-blue-500 dark:text-blue-400" />
+              </div>
+            </div>
+          )}
           {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 

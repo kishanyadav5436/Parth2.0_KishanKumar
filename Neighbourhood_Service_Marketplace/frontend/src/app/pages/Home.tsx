@@ -11,6 +11,7 @@ import CategoryCard from "../components/CategoryCard";
 import ServiceCard from "../components/ServiceCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { API_BASE_URL } from "../config";
+import { getMockProviders } from "../data/mockData";
 
 const categories = [
   { id: "ac-repair", name: "AC Repair", icon: "❄️", image: "https://images.unsplash.com/photo-1630481721508-5d37097dd8fc?auto=format&fit=crop&q=80&w=400", providers: 68 },
@@ -101,25 +102,32 @@ export default function Home() {
     fetch(`${API_BASE_URL}/api/services`)
       .then(res => res.json())
       .then(data => {
+        if (!data || data.length === 0) {
+          // Fallback to top 3 mock providers
+          setFeaturedProviders(getMockProviders().slice(0, 3));
+          return;
+        }
+
         const mappedData = data.slice(0, 3).map((d: any) => ({
           id: d._id,
           providerId: d.provider?._id || d.provider,
           name: d.provider?.name || "Premium Provider",
-
           service: d.title,
           category: d.category,
           rating: d.rating || 5,
           reviews: d.reviews || 0,
           price: `₹${d.price}/hr`,
           location: d.location || "Mumbai, Maharashtra",
-          image: d.image || "https://images.unsplash.com/photo-1581578731548-c64695ce6952?auto=format&fit=crop&q=80&w=400",
+          image: d.image || "",
           verified: true,
           experience: "Expert"
         }));
         setFeaturedProviders(mappedData);
       })
-
-      .catch(err => console.error(err))
+      .catch(err => {
+        console.error("Failed to fetch featured providers, using mock data:", err);
+        setFeaturedProviders(getMockProviders().slice(0, 3));
+      })
       .finally(() => setIsLoading(false));
   }, []);
 

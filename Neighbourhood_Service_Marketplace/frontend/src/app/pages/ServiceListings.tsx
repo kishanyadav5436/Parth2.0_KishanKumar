@@ -11,7 +11,7 @@ import ServiceCard from "../components/ServiceCard";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
 import MapView from "../components/MapView";
 import { LayoutGrid, Map as MapIcon } from "lucide-react";
-
+import { MOCK_PROVIDERS, getMockProviders } from "../data/mockData";
 
 export default function ServiceListings() {
   const { category } = useParams();
@@ -51,15 +51,22 @@ export default function ServiceListings() {
           price: `₹${d.price}/hr`,
           priceValue: d.price,
           location: d.location || "Mumbai, Maharashtra",
-          image: d.image || `https://images.unsplash.com/photo-1581578731548-c64695ce6952?auto=format&fit=crop&q=80&w=400`,
+          image: d.image || "",
           verified: true,
           experience: "Expert"
         }));
 
-        setAllProviders(mappedData);
+        // Use real data if available, otherwise fall back to mock data
+        if (mappedData.length > 0) {
+          setAllProviders(mappedData);
+        } else {
+          setAllProviders(getMockProviders(category));
+        }
 
       } catch (err) {
-        console.error("Failed to fetch providers:", err);
+        console.error("Failed to fetch providers, using mock data:", err);
+        // Fall back to mock data on any error
+        setAllProviders(getMockProviders(category));
       } finally {
         setIsLoading(false);
       }
