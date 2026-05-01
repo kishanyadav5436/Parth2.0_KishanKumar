@@ -193,6 +193,31 @@ export default function Auth() {
                     </div>
                   </div>
 
+                  {roleParam === 'provider' && (
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Service Category</Label>
+                      <div className="relative">
+                        <select
+                          className="w-full pl-4 pr-10 h-14 bg-white/50 dark:bg-slate-900/50 border-2 border-rose-500 rounded-2xl focus:ring-2 focus:ring-rose-500/20 appearance-none text-sm text-slate-900 dark:text-white"
+                          required
+                          value={signupData.category}
+                          onChange={(e) => setSignupData({ ...signupData, category: e.target.value })}
+                        >
+                          <option value="" disabled className="text-slate-500">Select your expertise</option>
+                          <option value="Plumbing">Plumbing</option>
+                          <option value="Electrical">Electrical</option>
+                          <option value="Cleaning">Cleaning</option>
+                          <option value="Carpentry">Carpentry</option>
+                          <option value="Painting">Painting</option>
+                          <option value="Appliance Repair">Appliance Repair</option>
+                          <option value="Pest Control">Pest Control</option>
+                          <option value="Landscaping">Landscaping</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="space-y-2">
                     <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Email Address</Label>
                     <div className="relative">
@@ -238,30 +263,6 @@ export default function Auth() {
                     </div>
                   </div>
 
-                  {roleParam === 'provider' && (
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Service Category</Label>
-                      <div className="relative">
-                        <select
-                          className="w-full pl-4 pr-10 h-14 bg-white/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20 appearance-none text-sm"
-                          required
-                          value={signupData.category}
-                          onChange={(e) => setSignupData({ ...signupData, category: e.target.value })}
-                        >
-                          <option value="" disabled>Select your expertise</option>
-                          <option value="Plumbing">Plumbing</option>
-                          <option value="Electrical">Electrical</option>
-                          <option value="Cleaning">Cleaning</option>
-                          <option value="Carpentry">Carpentry</option>
-                          <option value="Painting">Painting</option>
-                          <option value="Appliance Repair">Appliance Repair</option>
-                          <option value="Pest Control">Pest Control</option>
-                          <option value="Landscaping">Landscaping</option>
-                          <option value="Other">Other</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
 
                   <Button
                     type="submit"
