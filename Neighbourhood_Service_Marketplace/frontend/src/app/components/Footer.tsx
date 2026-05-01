@@ -59,8 +59,6 @@ export default function Footer() {
     <footer className="bg-slate-50 dark:bg-black text-slate-900 dark:text-white relative overflow-hidden transition-colors duration-500 border-t border-slate-200 dark:border-white/5">
       {/* Background decoration */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-72 h-72 bg-blue-600/5 dark:bg-blue-600/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-purple-600/5 dark:bg-purple-600/10 rounded-full blur-[100px]" />
       </div>
 
       {/* Stats Row */}
@@ -88,7 +86,7 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2 space-y-8">
             <Link to="/" className="flex items-center space-x-4 group">
-              <div className="h-12 w-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-600/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+              <div className="h-12 w-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300">
                 <Home className="h-6 w-6 text-white" />
               </div>
               <span className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white">ServiceHub</span>

@@ -136,11 +136,7 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500 overflow-x-hidden">
 
       {/* ── HERO ────────────────────────────────────── */}
-      <section className="relative overflow-hidden mesh-gradient py-24 md:py-36 px-4 noise-overlay">
-        {/* Floating orbs */}
-        <div className="absolute top-10 left-[10%] w-64 h-64 bg-white/5 rounded-full blur-3xl float-anim pointer-events-none" />
-        <div className="absolute bottom-10 right-[10%] w-48 h-48 bg-purple-400/10 rounded-full blur-3xl float-anim-delay pointer-events-none" />
-
+      <section className="relative overflow-hidden bg-blue-900 dark:bg-slate-900 py-24 md:py-36 px-4">
         <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -577,13 +573,7 @@ export default function Home() {
       </section>
 
       {/* ── CTA BANNER ───────────────────────────────── */}
-      <section className="py-24 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 mesh-gradient opacity-95" />
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/3 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/3 w-64 h-64 bg-purple-400/20 rounded-full blur-3xl" />
-        </div>
+      <section className="py-24 px-4 relative overflow-hidden bg-blue-900 dark:bg-slate-900">
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div

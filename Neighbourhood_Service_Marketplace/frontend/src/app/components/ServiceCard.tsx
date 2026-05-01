@@ -30,7 +30,7 @@ export default function ServiceCard({ provider }: ServiceCardProps) {
       transition={{ type: "spring", stiffness: 350, damping: 25 }}
       className="h-full"
     >
-      <div className="relative group h-full bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-black/40 hover:shadow-2xl hover:shadow-blue-600/10 dark:hover:shadow-blue-900/20 transition-all duration-500 flex flex-col border border-slate-100 dark:border-white/5">
+      <div className="relative group h-full bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col border border-slate-200 dark:border-slate-800">
 
         {/* Image area */}
         <div className="relative h-52 overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-700">
@@ -54,14 +54,14 @@ export default function ServiceCard({ provider }: ServiceCardProps) {
 
           {/* Verified badge */}
           {provider.verified && (
-            <Badge className="absolute top-4 left-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm text-blue-600 dark:text-blue-400 border-0 shadow-lg px-3 py-1.5 rounded-xl font-bold text-xs gap-1">
+            <Badge className="absolute top-4 left-4 bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-400 border border-slate-200 dark:border-slate-700 shadow-sm px-3 py-1.5 rounded-lg font-bold text-xs gap-1">
               <ShieldCheck className="h-3.5 w-3.5" />
               Verified Pro
             </Badge>
           )}
 
           {/* Price chip (top right) */}
-          <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20">
+          <div className="absolute top-4 right-4 bg-blue-900/80 px-3 py-1.5 rounded-lg border border-white/20">
             <p className="text-white font-black text-sm">{provider.price}</p>
           </div>
 
@@ -128,8 +128,7 @@ export default function ServiceCard({ provider }: ServiceCardProps) {
           </div>
         </div>
 
-        {/* Hover glow effect at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+        </div>
       </div>
     </motion.div>
   );

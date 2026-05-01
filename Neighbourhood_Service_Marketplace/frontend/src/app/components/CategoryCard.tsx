@@ -19,7 +19,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
       <Link to={`/services/${category.id}`}>
-        <div className="relative overflow-hidden cursor-pointer group rounded-[2.5rem] bg-slate-100 dark:bg-slate-900 h-64 shadow-lg hover:shadow-2xl hover:shadow-blue-600/20 dark:hover:shadow-blue-900/40 transition-all duration-500 border border-slate-200/50 dark:border-white/5">
+        <div className="relative overflow-hidden cursor-pointer group rounded-xl bg-slate-100 dark:bg-slate-900 h-64 shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200 dark:border-slate-800">
 
           {/* Background image */}
           <img
@@ -33,7 +33,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
 
 
           {/* Pro count - top right */}
-          <div className="absolute top-3 right-3 bg-white/15 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-xl">
+          <div className="absolute top-3 right-3 bg-blue-900/60 border border-white/20 px-2.5 py-1 rounded-lg">
             <span className="text-white text-xs font-black">{category.providers}+ Pros</span>
           </div>
 
@@ -55,8 +55,6 @@ export default function CategoryCard({ category }: CategoryCardProps) {
             </div>
           </div>
 
-          {/* Bottom glow bar */}
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
         </div>
       </Link>
     </motion.div>

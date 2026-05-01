@@ -24,6 +24,7 @@ export default function Auth() {
     email: "",
     password: "",
     confirmPassword: "",
+    category: "",
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -54,6 +55,10 @@ export default function Auth() {
       alert("Passwords don't match!");
       return;
     }
+    if (roleParam === 'provider' && !signupData.category) {
+      alert("Please select a service category");
+      return;
+    }
     setIsLoading(true);
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
@@ -64,7 +69,8 @@ export default function Auth() {
           name: signupData.name,
           email: signupData.email,
           password: signupData.password,
-          role: roleParam === 'provider' ? 'provider' : 'user'
+          role: roleParam === 'provider' ? 'provider' : 'user',
+          ...(roleParam === 'provider' && { category: signupData.category })
         })
       });
       const data = await res.json();
@@ -81,12 +87,6 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500 flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Mesh Gradient Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-40 dark:opacity-20">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/30 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-400/30 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
-      </div>
-
       <div className="max-w-md w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -97,10 +97,7 @@ export default function Auth() {
             BACK TO HOME
           </Link>
 
-          <Card className="glass-card border-white/20 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-2xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-8 opacity-5">
-              <Sparkles className="h-32 w-32 dark:text-white" />
-            </div>
+          <Card className="bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800 p-8 rounded-2xl shadow-xl overflow-hidden relative">
 
             <div className="text-center mb-10">
               <div className={`h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg ${roleParam === 'provider' ? 'bg-emerald-600 shadow-emerald-600/20' : 'bg-blue-600 shadow-blue-600/20'}`}>
@@ -240,6 +237,31 @@ export default function Auth() {
                       />
                     </div>
                   </div>
+
+                  {roleParam === 'provider' && (
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Service Category</Label>
+                      <div className="relative">
+                        <select
+                          className="w-full pl-4 pr-10 h-14 bg-white/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20 appearance-none text-sm"
+                          required
+                          value={signupData.category}
+                          onChange={(e) => setSignupData({ ...signupData, category: e.target.value })}
+                        >
+                          <option value="" disabled>Select your expertise</option>
+                          <option value="Plumbing">Plumbing</option>
+                          <option value="Electrical">Electrical</option>
+                          <option value="Cleaning">Cleaning</option>
+                          <option value="Carpentry">Carpentry</option>
+                          <option value="Painting">Painting</option>
+                          <option value="Appliance Repair">Appliance Repair</option>
+                          <option value="Pest Control">Pest Control</option>
+                          <option value="Landscaping">Landscaping</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
 
                   <Button
                     type="submit"

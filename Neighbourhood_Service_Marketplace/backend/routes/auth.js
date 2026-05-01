@@ -3,19 +3,44 @@ const router=express.Router();
 const User =require('../model/user');
 const bcrypt =require('bcrypt');
 const jwt =require('jsonwebtoken');
+const ProviderProfile = require('../model/providerProfile');
+const Service = require('../model/service');
 
 router.post('/register',async(req,res)=>{
     try{
-        const {name, email, password, role} = req.body;
+        const {name, email, password, role, category} = req.body;
         
         // Validation
         if(!name || name.trim() === '') return res.status(400).json({message: 'Name is required'});
         if(!email || !email.includes('@')) return res.status(400).json({message: 'Invalid email'});
         if(!password || password.length < 6) return res.status(400).json({message: 'Password must be at least 6 characters'});
+        
+        if (role === 'provider' && (!category || category.trim() === '')) {
+            return res.status(400).json({message: 'Service category is required for providers'});
+        }
 
         const hashPassword = await bcrypt.hash(password,10);
         const user = new User({name,email,password:hashPassword,role});
         await user.save();
+
+        if (role === 'provider') {
+            const providerProfile = new ProviderProfile({
+                user: user._id,
+                category
+            });
+            await providerProfile.save();
+
+            // Also create a default service for this provider so they show up in listings
+            const defaultService = new Service({
+                title: `${category} Service`,
+                category,
+                price: 500, // Default price
+                provider: user._id,
+                description: `Professional ${category} services in your neighbourhood.`,
+                location: 'Mumbai, Maharashtra'
+            });
+            await defaultService.save();
+        }
         
         const token = jwt.sign({id:user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn:'1h'});
         const isProduction = process.env.NODE_ENV === 'production';
