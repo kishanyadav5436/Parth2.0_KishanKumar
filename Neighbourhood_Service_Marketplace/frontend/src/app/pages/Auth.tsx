@@ -25,6 +25,7 @@ export default function Auth() {
     password: "",
     confirmPassword: "",
     category: "",
+    serviceName: "",
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -55,9 +56,15 @@ export default function Auth() {
       alert("Passwords don't match!");
       return;
     }
-    if (roleParam === 'provider' && !signupData.category) {
-      alert("Please select a service category");
-      return;
+    if (roleParam === 'provider') {
+      if (!signupData.category) {
+        alert("Please select a service category");
+        return;
+      }
+      if (!signupData.serviceName) {
+        alert("Please enter a service name");
+        return;
+      }
     }
     setIsLoading(true);
     try {
@@ -70,7 +77,10 @@ export default function Auth() {
           email: signupData.email,
           password: signupData.password,
           role: roleParam === 'provider' ? 'provider' : 'user',
-          ...(roleParam === 'provider' && { category: signupData.category })
+          ...(roleParam === 'provider' && { 
+            category: signupData.category,
+            serviceName: signupData.serviceName
+          })
         })
       });
       const data = await res.json();
@@ -194,26 +204,42 @@ export default function Auth() {
                   </div>
 
                   {roleParam === 'provider' && (
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Service Category</Label>
-                      <div className="relative">
-                        <select
-                          className="w-full pl-4 pr-10 h-14 bg-white/50 dark:bg-slate-900/50 border-2 border-rose-500 rounded-2xl focus:ring-2 focus:ring-rose-500/20 appearance-none text-sm text-slate-900 dark:text-white"
-                          required
-                          value={signupData.category}
-                          onChange={(e) => setSignupData({ ...signupData, category: e.target.value })}
-                        >
-                          <option value="" disabled className="text-slate-500">Select your expertise</option>
-                          <option value="Plumbing">Plumbing</option>
-                          <option value="Electrical">Electrical</option>
-                          <option value="Cleaning">Cleaning</option>
-                          <option value="Carpentry">Carpentry</option>
-                          <option value="Painting">Painting</option>
-                          <option value="Appliance Repair">Appliance Repair</option>
-                          <option value="Pest Control">Pest Control</option>
-                          <option value="Landscaping">Landscaping</option>
-                          <option value="Other">Other</option>
-                        </select>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Service Category</Label>
+                        <div className="relative">
+                          <select
+                            className="w-full pl-4 pr-10 h-14 bg-white/50 dark:bg-slate-900/50 border-2 border-rose-500 rounded-2xl focus:ring-2 focus:ring-rose-500/20 appearance-none text-sm text-slate-900 dark:text-white"
+                            required
+                            value={signupData.category}
+                            onChange={(e) => setSignupData({ ...signupData, category: e.target.value })}
+                          >
+                            <option value="" disabled className="text-slate-500">Select your expertise</option>
+                            <option value="Plumbing">Plumbing</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Cleaning">Cleaning</option>
+                            <option value="Carpentry">Carpentry</option>
+                            <option value="Painting">Painting</option>
+                            <option value="Appliance Repair">Appliance Repair</option>
+                            <option value="Pest Control">Pest Control</option>
+                            <option value="Landscaping">Landscaping</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Service Name / Business Name</Label>
+                        <div className="relative">
+                          <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                          <Input
+                            placeholder="e.g. Quick Fix Plumbing"
+                            className="pl-12 h-14 bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
+                            required={roleParam === 'provider'}
+                            value={signupData.serviceName}
+                            onChange={(e) => setSignupData({ ...signupData, serviceName: e.target.value })}
+                          />
+                        </div>
                       </div>
                     </div>
                   )}

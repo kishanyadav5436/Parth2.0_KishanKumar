@@ -11,6 +11,10 @@ const providerProfileSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    serviceName: {
+        type: String,
+        default: ''
+    },
     bio: {
         type: String,
         default: ''

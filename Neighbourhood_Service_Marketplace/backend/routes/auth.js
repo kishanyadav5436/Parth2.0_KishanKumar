@@ -8,15 +8,16 @@ const Service = require('../model/service');
 
 router.post('/register',async(req,res)=>{
     try{
-        const {name, email, password, role, category} = req.body;
+        const {name, email, password, role, category, serviceName} = req.body;
         
         // Validation
         if(!name || name.trim() === '') return res.status(400).json({message: 'Name is required'});
         if(!email || !email.includes('@')) return res.status(400).json({message: 'Invalid email'});
         if(!password || password.length < 6) return res.status(400).json({message: 'Password must be at least 6 characters'});
         
-        if (role === 'provider' && (!category || category.trim() === '')) {
-            return res.status(400).json({message: 'Service category is required for providers'});
+        if (role === 'provider') {
+            if (!category || category.trim() === '') return res.status(400).json({message: 'Service category is required for providers'});
+            if (!serviceName || serviceName.trim() === '') return res.status(400).json({message: 'Service name is required for providers'});
         }
 
         const hashPassword = await bcrypt.hash(password,10);
@@ -26,17 +27,18 @@ router.post('/register',async(req,res)=>{
         if (role === 'provider') {
             const providerProfile = new ProviderProfile({
                 user: user._id,
-                category
+                category,
+                serviceName
             });
             await providerProfile.save();
 
             // Also create a default service for this provider so they show up in listings
             const defaultService = new Service({
-                title: `${category} Service`,
+                title: serviceName,
                 category,
                 price: 500, // Default price
                 provider: user._id,
-                description: `Professional ${category} services in your neighbourhood.`,
+                description: `Professional ${category} services by ${serviceName} in your neighbourhood.`,
                 location: 'Mumbai, Maharashtra'
             });
             await defaultService.save();
