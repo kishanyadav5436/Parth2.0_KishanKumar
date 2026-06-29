@@ -41,7 +41,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     // Check auth on mount
     const checkAuth = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/auth/me`); // Assuming there's a /me endpoint
+        const res = await fetch(`${API_BASE_URL}/api/auth/me`, { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);

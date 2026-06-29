@@ -209,7 +209,7 @@ export default function Auth() {
                         <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Service Category</Label>
                         <div className="relative">
                           <select
-                            className="w-full pl-4 pr-10 h-14 bg-white/50 dark:bg-slate-900/50 border-2 border-rose-500 rounded-2xl focus:ring-2 focus:ring-rose-500/20 appearance-none text-sm text-slate-900 dark:text-white"
+                            className="w-full pl-4 pr-10 h-14 bg-white/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20 appearance-none text-sm text-slate-900 dark:text-white"
                             required
                             value={signupData.category}
                             onChange={(e) => setSignupData({ ...signupData, category: e.target.value })}

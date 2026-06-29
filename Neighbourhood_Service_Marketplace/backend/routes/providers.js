@@ -43,12 +43,13 @@ router.get('/user/:userId', async (req, res) => {
 // Create or update provider profile (Protected, Provider Only)
 router.post('/profile', verifyToken, isProvider, async (req, res) => {
     try {
-        const { category, bio, hourlyRate, location } = req.body;
+        const { category, bio, hourlyRate, location, serviceName } = req.body;
         let profile = await ProviderProfile.findOne({ user: req.user.id });
 
         if (profile) {
             // Update
             profile.category = category || profile.category;
+            profile.serviceName = serviceName || profile.serviceName;
             profile.bio = bio || profile.bio;
             profile.hourlyRate = hourlyRate || profile.hourlyRate;
             profile.location = location || profile.location;
@@ -60,6 +61,7 @@ router.post('/profile', verifyToken, isProvider, async (req, res) => {
         profile = new ProviderProfile({
             user: req.user.id,
             category,
+            serviceName,
             bio,
             hourlyRate,
             location
