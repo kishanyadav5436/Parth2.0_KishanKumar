@@ -72,7 +72,8 @@
   /* Formal Solid Card (replacing glass-card) */
   .glass-card {
     background-color: var(--solid-bg);
-    @apply border border-solid-border shadow-sm rounded-lg;
+    border: 1px solid var(--solid-border);
+    @apply shadow-sm rounded-lg;
   }
 
   /* Solid clean background (replacing mesh-gradient) */

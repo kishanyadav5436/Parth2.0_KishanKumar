@@ -128,7 +128,6 @@ export default function ServiceCard({ provider }: ServiceCardProps) {
           </div>
         </div>
 
-        </div>
       </div>
     </motion.div>
   );
