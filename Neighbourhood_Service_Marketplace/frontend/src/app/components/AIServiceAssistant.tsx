@@ -154,8 +154,8 @@ export default function AIServiceAssistant() {
                       <div className="space-y-3">
                         <div className={`p-4 rounded-2xl text-sm font-medium leading-relaxed shadow-sm ${
                           msg.role === 'user' 
-                          ? 'bg-blue-600 text-white rounded-tr-none' 
-                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-tl-none border border-slate-100 dark:border-slate-700'
+                          ? 'bg-blue-600 text-white rounded-tr-none font-semibold' 
+                          : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-none border border-slate-200 dark:border-slate-700'
                         }`}>
                           <div dangerouslySetInnerHTML={{ __html: msg.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
                         </div>
@@ -177,7 +177,7 @@ export default function AIServiceAssistant() {
                                 <span className="text-2xl">🔧</span>
                                 <div className="text-left">
                                   <p className="font-black text-sm">View {(msg as any).suggestion.name}</p>
-                                  <p className="text-xs text-slate-400 font-medium">Explore verified experts</p>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Explore verified experts</p>
                                 </div>
                               </div>
                               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -190,7 +190,7 @@ export default function AIServiceAssistant() {
                 ))}
                 {isTyping && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl rounded-tl-none border border-slate-100 dark:border-slate-700">
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl rounded-tl-none border border-slate-200 dark:border-slate-700">
                       <div className="flex gap-1">
                         {[0, 1, 2].map(i => (
                           <motion.div
@@ -207,7 +207,7 @@ export default function AIServiceAssistant() {
               </div>
 
               {/* Input */}
-              <div className="p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+              <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
                 <form 
                   onSubmit={(e) => { e.preventDefault(); handleSend(); }}
                   className="flex items-center gap-2"
@@ -216,7 +216,7 @@ export default function AIServiceAssistant() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Type your problem..."
-                    className="flex-1 bg-slate-50 dark:bg-slate-800 border-none rounded-xl h-12 px-4 text-sm font-medium focus-visible:ring-2 focus-visible:ring-blue-500/20"
+                    className="flex-1 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl h-12 px-4 text-sm font-medium focus-visible:ring-2 focus-visible:ring-blue-500/20"
                   />
                   <Button 
                     type="submit"

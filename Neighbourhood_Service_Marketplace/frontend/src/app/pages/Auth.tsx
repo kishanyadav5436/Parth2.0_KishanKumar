@@ -130,24 +130,22 @@ export default function Auth() {
                   <p className="text-emerald-600 dark:text-emerald-500 text-xs mt-0.5">You can list services, accept bookings, and earn from local clients.</p>
                 </div>
               </div>
-            )}
-
-            <Tabs defaultValue="login" className="space-y-8">
-              <TabsList className="grid w-full grid-cols-2 p-1 bg-slate-100 dark:bg-slate-900/50 rounded-xl">
-                <TabsTrigger value="login" className="rounded-lg font-bold data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 dark:text-gray-400 dark:data-[state=active]:text-white">Sign In</TabsTrigger>
-                <TabsTrigger value="signup" className="rounded-lg font-bold data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 dark:text-gray-400 dark:data-[state=active]:text-white">Create Account</TabsTrigger>
+            )}            <Tabs defaultValue="login" className="space-y-8">
+              <TabsList className="grid w-full grid-cols-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                <TabsTrigger value="login" className="rounded-lg font-bold text-slate-600 dark:text-slate-400 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-slate-900 dark:data-[state=active]:text-white shadow-sm">Sign In</TabsTrigger>
+                <TabsTrigger value="signup" className="rounded-lg font-bold text-slate-600 dark:text-slate-400 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-slate-900 dark:data-[state=active]:text-white shadow-sm">Create Account</TabsTrigger>
               </TabsList>
 
               <TabsContent value="login" className="space-y-6">
                 <form onSubmit={handleLogin} className="space-y-6">
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Email Address</Label>
+                    <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest px-1">Email Address</Label>
                     <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                       <Input
                         type="email"
                         placeholder="you@example.com"
-                        className="pl-12 h-14 bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
+                        className="pl-12 h-14 bg-slate-50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
                         required
                         value={loginData.email}
                         onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
@@ -156,13 +154,13 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Password</Label>
+                    <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest px-1">Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                       <Input
                         type="password"
                         placeholder="••••••••"
-                        className="pl-12 h-14 bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
+                        className="pl-12 h-14 bg-slate-50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
                         required
                         value={loginData.password}
                         onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
@@ -173,7 +171,7 @@ export default function Auth() {
                   <div className="flex items-center justify-between">
                     <label className="flex items-center cursor-pointer group">
                       <input type="checkbox" className="w-5 h-5 rounded-lg border-2 border-slate-200 dark:border-slate-800 mr-2 accent-blue-600" />
-                      <span className="text-sm font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-700 transition-colors">Keep me signed in</span>
+                      <span className="text-sm font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200 transition-colors">Keep me signed in</span>
                     </label>
                   </div>
 
@@ -190,12 +188,12 @@ export default function Auth() {
               <TabsContent value="signup" className="space-y-6">
                 <form onSubmit={handleSignup} className="space-y-6">
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Full Name</Label>
+                    <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest px-1">Full Name</Label>
                     <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                       <Input
                         placeholder="John Doe"
-                        className="pl-12 h-14 bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
+                        className="pl-12 h-14 bg-slate-50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
                         required
                         value={signupData.name}
                         onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
@@ -206,35 +204,35 @@ export default function Auth() {
                   {roleParam === 'provider' && (
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Service Category</Label>
+                        <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest px-1">Service Category</Label>
                         <div className="relative">
                           <select
-                            className="w-full pl-4 pr-10 h-14 bg-white/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20 appearance-none text-sm text-slate-900 dark:text-white"
+                            className="w-full pl-4 pr-10 h-14 bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20 appearance-none text-sm text-slate-900 dark:text-white font-medium"
                             required
                             value={signupData.category}
                             onChange={(e) => setSignupData({ ...signupData, category: e.target.value })}
                           >
-                            <option value="" disabled className="text-slate-500">Select your expertise</option>
-                            <option value="Plumbing">Plumbing</option>
-                            <option value="Electrical">Electrical</option>
-                            <option value="Cleaning">Cleaning</option>
-                            <option value="Carpentry">Carpentry</option>
-                            <option value="Painting">Painting</option>
-                            <option value="Appliance Repair">Appliance Repair</option>
-                            <option value="Pest Control">Pest Control</option>
-                            <option value="Landscaping">Landscaping</option>
-                            <option value="Other">Other</option>
+                            <option value="" disabled className="text-slate-400 bg-white dark:bg-slate-900">Select your expertise</option>
+                            <option value="Plumbing" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Plumbing</option>
+                            <option value="Electrical" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Electrical</option>
+                            <option value="Cleaning" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Cleaning</option>
+                            <option value="Carpentry" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Carpentry</option>
+                            <option value="Painting" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Painting</option>
+                            <option value="Appliance Repair" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Appliance Repair</option>
+                            <option value="Pest Control" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Pest Control</option>
+                            <option value="Landscaping" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Landscaping</option>
+                            <option value="Other" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Other</option>
                           </select>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Service Name / Business Name</Label>
+                        <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest px-1">Service Name / Business Name</Label>
                         <div className="relative">
-                          <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                          <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                           <Input
                             placeholder="e.g. Quick Fix Plumbing"
-                            className="pl-12 h-14 bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
+                            className="pl-12 h-14 bg-slate-50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
                             required={roleParam === 'provider'}
                             value={signupData.serviceName}
                             onChange={(e) => setSignupData({ ...signupData, serviceName: e.target.value })}
@@ -245,13 +243,13 @@ export default function Auth() {
                   )}
 
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Email Address</Label>
+                    <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest px-1">Email Address</Label>
                     <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                       <Input
                         type="email"
                         placeholder="you@example.com"
-                        className="pl-12 h-14 bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
+                        className="pl-12 h-14 bg-slate-50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
                         required
                         value={signupData.email}
                         onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
@@ -260,13 +258,13 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Password</Label>
+                    <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest px-1">Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                       <Input
                         type="password"
                         placeholder="••••••••"
-                        className="pl-12 h-14 bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
+                        className="pl-12 h-14 bg-slate-50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
                         required
                         value={signupData.password}
                         onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
@@ -275,20 +273,19 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Confirm Password</Label>
+                    <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest px-1">Confirm Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                       <Input
                         type="password"
                         placeholder="••••••••"
-                        className="pl-12 h-14 bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
+                        className="pl-12 h-14 bg-slate-50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20"
                         required
                         value={signupData.confirmPassword}
                         onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
                       />
                     </div>
                   </div>
-
 
                   <Button
                     type="submit"

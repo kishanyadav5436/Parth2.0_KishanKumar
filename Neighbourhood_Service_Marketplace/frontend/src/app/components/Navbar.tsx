@@ -1,8 +1,7 @@
-import { Link } from "react-router-dom";
-import { Menu, Search, User, Home, Moon, Sun, Settings, LogOut, Wrench, ChevronDown, BookOpen } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, Search, User, Home, Moon, Sun, Settings, LogOut, Wrench, ChevronDown, BookOpen, Bell, Check, ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import { Badge } from "./ui/badge";
 import { API_BASE_URL } from "../config";
@@ -10,8 +9,9 @@ import { API_BASE_URL } from "../config";
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, setUser, theme, toggleTheme } = useAppContext();
+  const { user, setUser, theme, toggleTheme, notifications, unreadNotificationsCount, markNotificationAsRead, clearAllNotifications } = useAppContext();
 
   const handleSignOut = async () => {
     try {
@@ -60,6 +60,85 @@ export default function Navbar() {
             <Button variant="ghost" size="sm" onClick={toggleTheme} className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl">
               {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </Button>
+
+            {/* Notification Bell */}
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => { setIsNotifOpen(!isNotifOpen); setIsUserMenuOpen(false); }}
+                className="relative text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl"
+              >
+                <Bell className="h-5 w-5" />
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-black text-white shadow-sm animate-pulse">
+                    {unreadNotificationsCount}
+                  </span>
+                )}
+              </Button>
+
+              {/* Notification Dropdown */}
+              {isNotifOpen && (
+                <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-black/50 border border-slate-200 dark:border-slate-800 overflow-hidden z-50">
+                  <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Bell className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <span className="font-black text-sm text-slate-900 dark:text-white">Notifications</span>
+                      {unreadNotificationsCount > 0 && (
+                        <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs font-black px-2 py-0.5 rounded-full">
+                          {unreadNotificationsCount} new
+                        </span>
+                      )}
+                    </div>
+                    {unreadNotificationsCount > 0 && (
+                      <button
+                        onClick={clearAllNotifications}
+                        className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
+                    {notifications.length === 0 ? (
+                      <div className="p-8 text-center text-slate-400 text-sm font-medium">No notifications</div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div
+                          key={n.id}
+                          onClick={() => {
+                            markNotificationAsRead(n.id);
+                            if (n.link) { setIsNotifOpen(false); navigate(n.link); }
+                          }}
+                          className={`p-4 transition-colors cursor-pointer flex items-start gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 ${
+                            !n.read ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''
+                          }`}
+                        >
+                          <div className={`mt-0.5 h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
+                            n.type === 'promo' ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30' :
+                            n.type === 'booking' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' :
+                            'bg-blue-100 text-blue-600 dark:bg-blue-900/30'
+                          }`}>
+                            <Sparkles className="h-4 w-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <p className={`text-sm leading-snug truncate ${!n.read ? 'font-black text-slate-900 dark:text-white' : 'font-bold text-slate-700 dark:text-slate-300'}`}>
+                                {n.title}
+                              </p>
+                              <span className="text-[10px] text-slate-400 font-bold shrink-0 ml-2">{n.createdAt}</span>
+                            </div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal line-clamp-2">{n.message}</p>
+                          </div>
+                          {!n.read && <div className="h-2 w-2 rounded-full bg-blue-600 shrink-0 mt-2" />}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Search */}
             <Button variant="ghost" size="sm" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl" onClick={() => navigate('/services')}>

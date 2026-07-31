@@ -12,6 +12,7 @@ import ServiceCard from "../components/ServiceCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { API_BASE_URL } from "../config";
 import { getMockProviders } from "../data/mockData";
+import CostEstimator from "../components/CostEstimator";
 
 const categories = [
   { id: "ac-repair", name: "AC Repair", icon: "❄️", image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=400", providers: 68 },
@@ -436,6 +437,13 @@ export default function Home() {
               </Button>
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* ── INSTANT COST ESTIMATOR ────────────────── */}
+      <section className="py-16 px-4 bg-slate-100 dark:bg-slate-900/60">
+        <div className="max-w-7xl mx-auto">
+          <CostEstimator />
         </div>
       </section>
 

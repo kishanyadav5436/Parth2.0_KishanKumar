@@ -276,14 +276,14 @@ export default function Booking() {
                     { label: "Service Address", icon: MapPin, key: "address", type: "text", placeholder: "Flat/House, Street, City" },
                   ].map(({ label, icon: Icon, key, type, placeholder }) => (
                     <div key={key} className="space-y-1.5">
-                      <Label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{label}</Label>
+                      <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">{label}</Label>
                       <div className="relative">
                         <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <Input
                           type={type}
                           required
                           placeholder={placeholder}
-                          className="pl-10 h-12 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20"
+                          className="pl-10 h-12 bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/20"
                           value={(formData as any)[key]}
                           onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
                         />
@@ -301,18 +301,18 @@ export default function Booking() {
                 </h2>
                 <div className="grid md:grid-cols-2 gap-5">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Service Date</Label>
+                    <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">Service Date</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
-                          className="w-full h-12 justify-start text-left font-medium bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl dark:text-white gap-3"
+                          className="w-full h-12 justify-start text-left font-semibold bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white gap-3 hover:bg-slate-100 dark:hover:bg-slate-800"
                         >
                           <Calendar className="h-4 w-4 text-slate-400" />
                           {date ? format(date, "PPP") : <span className="text-slate-400">Pick a date</span>}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 rounded-2xl overflow-hidden border-slate-200 dark:border-slate-800 dark:bg-slate-900" align="start">
+                      <PopoverContent className="w-auto p-0 rounded-2xl overflow-hidden border-slate-200 dark:border-slate-800 dark:bg-slate-900 shadow-2xl" align="start">
                         <CalendarComponent
                           mode="single"
                           selected={date}
@@ -325,17 +325,17 @@ export default function Booking() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Preferred Time</Label>
+                    <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">Preferred Time</Label>
                     <Select value={selectedTime} onValueChange={setSelectedTime}>
-                      <SelectTrigger className="h-12 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl dark:text-white">
+                      <SelectTrigger className="h-12 bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-slate-400" />
                           <SelectValue placeholder="Choose a slot" />
                         </div>
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl dark:bg-slate-900 dark:border-slate-800">
+                      <SelectContent className="rounded-xl dark:bg-slate-900 dark:border-slate-800 shadow-2xl">
                         {timeSlots.map((time) => (
-                          <SelectItem key={time} value={time} className="font-medium">{time}</SelectItem>
+                          <SelectItem key={time} value={time} className="font-semibold">{time}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -353,7 +353,7 @@ export default function Booking() {
                   <MessageSquare className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
                   <Textarea
                     placeholder="e.g., 'AC unit is making a loud noise and not cooling properly. It's a 1.5 ton split AC.'"
-                    className="pl-11 min-h-[140px] bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl py-3 dark:text-white resize-none focus:ring-2 focus:ring-blue-500/20"
+                    className="pl-11 min-h-[140px] bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 rounded-xl py-3 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-none focus:ring-2 focus:ring-blue-500/20 font-medium"
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   />
@@ -379,8 +379,8 @@ export default function Booking() {
                         onClick={() => setFormData({ ...formData, paymentMethod: method.id })}
                         className={`cursor-pointer rounded-2xl border-2 p-4 flex flex-col items-center justify-center gap-3 transition-all ${
                           isSelected
-                            ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold"
-                            : "border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-blue-300 dark:hover:border-slate-700"
+                            ? "border-blue-600 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold shadow-sm"
+                            : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-blue-300 dark:hover:border-slate-700"
                         }`}
                       >
                         <method.icon className={`h-6 w-6 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-slate-400"}`} />

@@ -75,6 +75,7 @@ export default function MyBookings() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
   const [cancelling, setCancelling] = useState<string | null>(null);
+  const [selectedReviewBooking, setSelectedReviewBooking] = useState<any>(null);
 
   const fetchBookings = async () => {
     setIsLoading(true);
@@ -453,11 +454,14 @@ export default function MyBookings() {
 
                           {/* Customer: leave review on completed */}
                           {!isProvider && booking.status === "completed" && (
-                            <Link to={`/provider/${booking.provider?._id}`}>
-                              <Button size="sm" variant="outline" className="border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 font-bold rounded-xl h-9 px-4 text-xs gap-1">
-                                <Star className="h-3.5 w-3.5" /> Leave Review
-                              </Button>
-                            </Link>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedReviewBooking(booking)}
+                              className="border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 font-bold rounded-xl h-9 px-4 text-xs gap-1"
+                            >
+                              <Star className="h-3.5 w-3.5" /> Leave Review
+                            </Button>
                           )}
 
                           {/* View provider profile */}
@@ -477,6 +481,12 @@ export default function MyBookings() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <ReviewModal
+          isOpen={!!selectedReviewBooking}
+          booking={selectedReviewBooking}
+          onClose={() => setSelectedReviewBooking(null)}
+        />
       </div>
     </div>
   );

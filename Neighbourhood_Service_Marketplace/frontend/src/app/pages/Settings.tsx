@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Bell, Shield, Moon, Sun, LogOut, ChevronRight, Save, Wrench, Star, Zap, BookOpen, ArrowRight } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
@@ -10,10 +10,12 @@ import { Label } from "../components/ui/label";
 import { Badge } from "../components/ui/badge";
 import { useNavigate, Link } from "react-router-dom";
 import { API_BASE_URL } from "../config";
+import AddServiceModal from "../components/AddServiceModal";
 
 export default function Settings() {
   const { user, setUser, theme, toggleTheme } = useAppContext();
   const navigate = useNavigate();
+  const [isAddServiceOpen, setIsAddServiceOpen] = useState(false);
   const isProvider = user?.role === 'provider';
 
   const handleSignOut = async () => {
@@ -26,10 +28,25 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300 pb-20">
+      <AddServiceModal
+        isOpen={isAddServiceOpen}
+        onClose={() => setIsAddServiceOpen(false)}
+      />
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-10">
-          <h1 className="text-4xl font-black dark:text-white mb-2 tracking-tight">Settings</h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium">Manage your account preferences and application appearance.</p>
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-10 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-black dark:text-white mb-2 tracking-tight">Settings</h1>
+            <p className="text-slate-500 dark:text-slate-400 font-medium">Manage your account preferences and application appearance.</p>
+          </div>
+          {isProvider && (
+            <Button
+              onClick={() => setIsAddServiceOpen(true)}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-6 h-12 font-bold shadow-lg shadow-emerald-600/20"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Service
+            </Button>
+          )}
         </motion.div>
 
         <div className="grid gap-8">
@@ -82,18 +99,18 @@ export default function Settings() {
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Full Name</Label>
+                  <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-wider">Full Name</Label>
                   <Input
                     defaultValue={user?.name || ""}
-                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl h-12 focus:ring-2 focus:ring-blue-500/20"
+                    className="bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl h-12 focus:ring-2 focus:ring-blue-500/20 font-medium"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email Address</Label>
+                  <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-wider">Email Address</Label>
                   <Input
                     defaultValue={user?.email || ""}
                     disabled
-                    className="bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-500 rounded-xl h-12 opacity-70"
+                    className="bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-xl h-12 opacity-80 cursor-not-allowed font-medium"
                   />
                 </div>
               </div>

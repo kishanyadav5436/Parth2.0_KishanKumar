@@ -151,14 +151,14 @@ export default function ServiceListings() {
   const FilterContent = () => (
     <div className="space-y-8">
       <div>
-        <Label className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 block">Location</Label>
+        <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3 block">Location</Label>
         <div className="relative">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input 
             placeholder="Filter by city..."
             value={locationQuery}
             onChange={(e) => setLocationQuery(e.target.value)}
-            className="pl-10 h-11 bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-xl"
+            className="pl-10 h-11 bg-slate-50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 rounded-xl font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
           />
           {locationQuery && (
             <button 
@@ -172,24 +172,24 @@ export default function ServiceListings() {
       </div>
 
       <div>
-        <Label className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 block">Sort By</Label>
+        <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3 block">Sort By</Label>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-full bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-xl h-11">
+          <SelectTrigger className="w-full bg-slate-50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 rounded-xl h-11 text-slate-900 dark:text-slate-100 font-semibold">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="rounded-xl border-gray-200 dark:border-slate-800">
-            <SelectItem value="rating">Highest Rated</SelectItem>
-            <SelectItem value="reviews">Most Reviews</SelectItem>
-            <SelectItem value="price-low">Price: Low to High</SelectItem>
-            <SelectItem value="price-high">Price: High to Low</SelectItem>
+          <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
+            <SelectItem value="rating" className="font-semibold">Highest Rated</SelectItem>
+            <SelectItem value="reviews" className="font-semibold">Most Reviews</SelectItem>
+            <SelectItem value="price-low" className="font-semibold">Price: Low to High</SelectItem>
+            <SelectItem value="price-high" className="font-semibold">Price: High to Low</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div>
-        <div className="flex justify-between items-center mb-4">
-          <Label className="text-sm font-bold text-gray-400 uppercase tracking-widest block">Price Range</Label>
-          <span className="text-blue-600 dark:text-blue-400 font-bold">₹{priceRange[0]} - ₹{priceRange[1]}</span>
+        <div className="flex justify-between items-center mb-3">
+          <Label className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest block">Price Range</Label>
+          <span className="text-blue-600 dark:text-blue-400 font-black text-sm">₹{priceRange[0]} - ₹{priceRange[1]}</span>
         </div>
         <Slider
           value={priceRange}
@@ -198,7 +198,7 @@ export default function ServiceListings() {
           step={50}
           className="mt-2"
         />
-        <div className="flex justify-between mt-2 text-xs text-gray-400 font-medium">
+        <div className="flex justify-between mt-2 text-xs text-slate-400 font-bold">
           <span>₹0</span>
           <span>₹2000+</span>
         </div>
