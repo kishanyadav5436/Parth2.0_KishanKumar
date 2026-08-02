@@ -1,13 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
-import Root from "./pages/Root";
-import Home from "./pages/Home";
-import ServiceListings from "./pages/ServiceListings";
-import ProviderProfile from "./pages/ProviderProfile";
-import Booking from "./pages/Booking";
 import Auth from "./pages/Auth";
-import NotFound from "./pages/NotFound";
-import Settings from "./pages/Settings";
+import Booking from "./pages/Booking";
+import Home from "./pages/Home";
 import MyBookings from "./pages/MyBookings";
+import NotFound from "./pages/NotFound";
+import ProviderProfile from "./pages/ProviderProfile";
+import Root from "./pages/Root";
+import ServiceListings from "./pages/ServiceListings";
+import Settings from "./pages/Settings";
 import Support from "./pages/Support";
 
 export const router = createBrowserRouter([
@@ -19,7 +19,7 @@ export const router = createBrowserRouter([
       { path: "services", Component: ServiceListings },
       { path: "services/:category", Component: ServiceListings },
       { path: "provider/:id", Component: ProviderProfile },
-      { path: "booking/:providerId", Component: Booking },
+      { path: "booking/:serviceId", Component: Booking },
       { path: "bookings", Component: MyBookings },
       { path: "auth", Component: Auth },
       { path: "settings", Component: Settings },

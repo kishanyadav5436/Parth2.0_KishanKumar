@@ -1,22 +1,35 @@
-import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import {
-  Calendar, Clock, MapPin, User, Mail, Phone, MessageSquare,
-  ArrowLeft, ShieldCheck, CheckCircle2, Loader2, AlertCircle, Lock,
-  CreditCard, Wallet, Banknote
-} from "lucide-react";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
+import {
+    AlertCircle,
+    ArrowLeft,
+    Banknote,
+    Calendar,
+    CheckCircle2,
+    Clock,
+    CreditCard,
+    Loader2,
+    Lock,
+    Mail,
+    MapPin,
+    MessageSquare,
+    Phone,
+    ShieldCheck,
+    User,
+    Wallet
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../components/ui/button";
+import { Calendar as CalendarComponent } from "../components/ui/calendar";
 import { Card } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Textarea } from "../components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { Calendar as CalendarComponent } from "../components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
-import { format } from "date-fns";
-import { useAppContext } from "../context/AppContext";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Textarea } from "../components/ui/textarea";
 import { API_BASE_URL } from "../config";
+import { useAppContext } from "../context/AppContext";
 
 const timeSlots = [
   "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
@@ -24,7 +37,7 @@ const timeSlots = [
 ];
 
 export default function Booking() {
-  const { providerId: serviceId } = useParams();
+  const { serviceId } = useParams();
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAppContext();
 
@@ -202,7 +215,9 @@ export default function Booking() {
   }
 
   // Self-booking prevention
-  const isSelfBooking = user?._id === service?.provider?._id || user?.id === service?.provider?._id;
+  const userId = user?._id || user?.id;
+  const serviceProviderId = service?.provider?._id || service?.provider;
+  const isSelfBooking = !!userId && !!serviceProviderId && serviceProviderId.toString() === userId.toString();
   if (isSelfBooking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
