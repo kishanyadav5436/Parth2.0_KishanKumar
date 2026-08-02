@@ -11,6 +11,7 @@ import { Badge } from "../components/ui/badge";
 import { useAppContext } from "../context/AppContext";
 import { format } from "date-fns";
 import { API_BASE_URL } from "../config";
+import ReviewModal from "../components/ReviewModal";
 
 type BookingStatus = "pending" | "accepted" | "completed" | "rejected";
 
