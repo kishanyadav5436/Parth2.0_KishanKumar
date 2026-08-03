@@ -72,6 +72,12 @@ export default function Booking() {
   // Fetch service details
   useEffect(() => {
     const fetchService = async () => {
+      // Validate that serviceId looks like a MongoDB ObjectId (24 hex chars)
+      if (!serviceId || !/^[a-fA-F0-9]{24}$/.test(serviceId)) {
+        setError("Invalid service link. Please go back and select a valid service.");
+        setIsLoading(false);
+        return;
+      }
       try {
         const res = await fetch(`${API_BASE_URL}/api/services/${serviceId}`, { credentials: 'include' });
         if (!res.ok) throw new Error("Service not found");
@@ -79,12 +85,12 @@ export default function Booking() {
         setService(data);
       } catch (err) {
         console.error(err);
-        setError("Could not load service details.");
+        setError("Could not load service details. The service may no longer exist.");
       } finally {
         setIsLoading(false);
       }
     };
-    if (serviceId) fetchService();
+    fetchService();
   }, [serviceId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -333,7 +339,7 @@ export default function Booking() {
                           selected={date}
                           onSelect={setDate}
                           disabled={(d) => d < new Date()}
-                          initialFocus
+                          autoFocus
                         />
                       </PopoverContent>
                     </Popover>

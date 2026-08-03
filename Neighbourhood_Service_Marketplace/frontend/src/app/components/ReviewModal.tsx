@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Star, X, Check, ThumbsUp, Sparkles, MessageSquare, Camera } from "lucide-react";
+import { Star, X, ThumbsUp, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { useAppContext } from "../context/AppContext";
+import { API_BASE_URL } from "../config";
 
 interface ReviewModalProps {
   isOpen: boolean;
@@ -28,8 +29,15 @@ export default function ReviewModal({ isOpen, onClose, booking, onReviewSubmitte
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
   if (!isOpen || !booking) return null;
+
+  // Resolve provider and service names from actual booking data shape
+  const providerName = booking.provider?.name || booking.providerName || "Service Expert";
+  const serviceName = booking.service?.title || booking.serviceName || "Service";
+  const providerId = booking.provider?._id || booking.provider;
+  const bookingId = booking._id;
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
@@ -37,36 +45,69 @@ export default function ReviewModal({ isOpen, onClose, booking, onReviewSubmitte
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setIsSubmitting(true);
 
-    const newReview = {
-      id: "rev-" + Date.now(),
-      rating,
-      comment,
-      tags: selectedTags,
-      date: "Just now",
-      providerName: booking.providerName || "Service Expert",
-    };
+    try {
+      // Build comment with tags included
+      const fullComment = [
+        comment,
+        selectedTags.length > 0 ? `\nHighlights: ${selectedTags.join(", ")}` : ""
+      ].join("").trim();
 
-    setTimeout(() => {
-      setIsSubmitting(false);
+      const res = await fetch(`${API_BASE_URL}/api/reviews`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          providerId,
+          bookingId,
+          rating,
+          comment: fullComment,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Failed to submit review. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
+
       setIsSubmitted(true);
 
-      if (onReviewSubmitted) onReviewSubmitted(newReview);
+      if (onReviewSubmitted) {
+        onReviewSubmitted({
+          ...data.review,
+          rating,
+          comment: fullComment,
+          tags: selectedTags,
+          providerName,
+        });
+      }
 
       addNotification({
         title: "Review Submitted! ⭐",
-        message: `Thank you for rating ${booking.providerName || "your provider"} ${rating} stars.`,
+        message: `Thank you for rating ${providerName} ${rating} stars.`,
         type: "booking"
       });
 
       setTimeout(() => {
         setIsSubmitted(false);
+        setRating(5);
+        setHoverRating(0);
+        setSelectedTags([]);
+        setComment("");
+        setError("");
         onClose();
       }, 1500);
-    }, 700);
+    } catch (err) {
+      setError("Network error. Please check your connection and try again.");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -77,7 +118,7 @@ export default function ReviewModal({ isOpen, onClose, booking, onReviewSubmitte
           <div>
             <h3 className="font-black text-lg text-slate-900 dark:text-white leading-snug">Rate & Review Service</h3>
             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-              {booking.serviceName || "Service"} by {booking.providerName || "Provider"}
+              {serviceName} by {providerName}
             </p>
           </div>
           <button
@@ -100,6 +141,13 @@ export default function ReviewModal({ isOpen, onClose, booking, onReviewSubmitte
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Error display */}
+              {error && (
+                <div className="p-3 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-400 text-sm font-semibold">
+                  {error}
+                </div>
+              )}
+
               {/* Star rating selector */}
               <div className="text-center bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-800">
                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Overall Satisfaction</p>
@@ -173,7 +221,11 @@ export default function ReviewModal({ isOpen, onClose, booking, onReviewSubmitte
                 disabled={isSubmitting}
                 className="w-full h-12 bg-blue-600 hover:bg-blue-500 text-white font-black text-base rounded-2xl shadow-xl shadow-blue-600/30"
               >
-                {isSubmitting ? "Submitting Review..." : "Submit Verified Review"}
+                {isSubmitting ? (
+                  <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Submitting Review...</>
+                ) : (
+                  "Submit Verified Review"
+                )}
               </Button>
             </form>
           )}
