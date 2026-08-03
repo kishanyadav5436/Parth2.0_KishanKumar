@@ -138,11 +138,31 @@ export default function Booking() {
     const isRealService = realServiceId && /^[a-fA-F0-9]{24}$/.test(realServiceId);
 
     if (!isRealService) {
-      // Mock/demo service — simulate a successful booking
+      // Mock/demo service — save to localStorage so it shows in My Bookings
+      const mockBooking = {
+        _id: "mock-" + Date.now(),
+        provider: { _id: service?.provider?._id || serviceId, name: service?.provider?.name || "Expert", email: "" },
+        customer: { _id: user._id || user.id, name: user.name, email: user.email },
+        service: { _id: serviceId, title: service?.title || "Service", category: service?.category || "", price: service?.price || 0 },
+        date: date.toISOString(),
+        timeSlot: selectedTime,
+        description: formData.message,
+        phone: formData.phone,
+        address: formData.address,
+        paymentMethod: formData.paymentMethod,
+        status: "pending" as const,
+        createdAt: new Date().toISOString(),
+      };
+      try {
+        const existing = JSON.parse(localStorage.getItem("mockBookings") || "[]");
+        existing.unshift(mockBooking);
+        localStorage.setItem("mockBookings", JSON.stringify(existing));
+      } catch { /* ignore storage errors */ }
+
       setTimeout(() => {
         setIsSubmitting(false);
         setIsSuccess(true);
-        setTimeout(() => navigate('/'), 3500);
+        setTimeout(() => navigate('/bookings'), 3500);
       }, 800);
       return;
     }

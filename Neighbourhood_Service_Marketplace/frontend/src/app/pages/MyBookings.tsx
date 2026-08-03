@@ -78,18 +78,73 @@ export default function MyBookings() {
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [selectedReviewBooking, setSelectedReviewBooking] = useState<any>(null);
 
-  const fetchBookings = async () => {
-    setIsLoading(true);
+  const updateBookingStatus = async (bookingId: string, status: BookingStatus) => {
+    if (bookingId.startsWith("mock-")) {
+      // Update mock booking in localStorage
+      try {
+        const localMockStr = localStorage.getItem("mockBookings");
+        if (localMockStr) {
+          const list = JSON.parse(localMockStr);
+          const updated = list.map((b: any) => (b._id === bookingId ? { ...b, status } : b));
+          localStorage.setItem("mockBookings", JSON.stringify(updated));
+        }
+      } catch (err) {
+        console.error("Error updating mock booking in localStorage:", err);
+      }
+      setBookings((prev) =>
+        prev.map((b) => (b._id === bookingId ? { ...b, status } : b))
+      );
+      return true;
+    }
+
     try {
-      const res = await fetch(`${API_BASE_URL}/api/bookings`, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch bookings");
-      const data = await res.json();
-      setBookings(data);
+      const res = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}/status`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) {
+        setBookings((prev) =>
+          prev.map((b) => (b._id === bookingId ? { ...b, status } : b))
+        );
+        return true;
+      }
     } catch (err) {
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
+    return false;
+  };
+
+  const fetchBookings = async () => {
+    setIsLoading(true);
+    let apiBookings: Booking[] = [];
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/bookings`, { credentials: "include" });
+      if (res.ok) {
+        apiBookings = await res.json();
+      }
+    } catch (err) {
+      console.error("Error fetching API bookings:", err);
+    }
+
+    let localBookings: Booking[] = [];
+    try {
+      const localStr = localStorage.getItem("mockBookings");
+      if (localStr) {
+        localBookings = JSON.parse(localStr);
+      }
+    } catch (err) {
+      console.error("Error parsing local mock bookings:", err);
+    }
+
+    // Merge API and local bookings, sorting by creation date descending
+    const combined = [...localBookings, ...apiBookings].sort(
+      (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+    );
+
+    setBookings(combined);
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -103,23 +158,8 @@ export default function MyBookings() {
   const handleCancel = async (bookingId: string) => {
     if (!confirm("Cancel this booking?")) return;
     setCancelling(bookingId);
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}/status`, {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "rejected" }),
-      });
-      if (res.ok) {
-        setBookings((prev) =>
-          prev.map((b) => (b._id === bookingId ? { ...b, status: "rejected" } : b))
-        );
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setCancelling(null);
-    }
+    await updateBookingStatus(bookingId, "rejected");
+    setCancelling(null);
   };
 
   const filteredBookings = bookings.filter((b) => {
@@ -397,14 +437,7 @@ export default function MyBookings() {
                               <Button
                                 size="sm"
                                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl h-9 px-4 shadow-sm text-xs gap-1"
-                                onClick={async () => {
-                                  const res = await fetch(`${API_BASE_URL}/api/bookings/${booking._id}/status`, {
-                                    method: "PATCH", credentials: "include",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({ status: "accepted" }),
-                                  });
-                                  if (res.ok) setBookings(prev => prev.map(b => b._id === booking._id ? { ...b, status: "accepted" } : b));
-                                }}
+                                onClick={() => updateBookingStatus(booking._id, "accepted")}
                               >
                                 <CheckCircle2 className="h-3.5 w-3.5" /> Accept
                               </Button>
@@ -426,14 +459,7 @@ export default function MyBookings() {
                             <Button
                               size="sm"
                               className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl h-9 px-4 text-xs gap-1"
-                              onClick={async () => {
-                                const res = await fetch(`${API_BASE_URL}/api/bookings/${booking._id}/status`, {
-                                  method: "PATCH", credentials: "include",
-                                  headers: { "Content-Type": "application/json" },
-                                  body: JSON.stringify({ status: "completed" }),
-                                });
-                                if (res.ok) setBookings(prev => prev.map(b => b._id === booking._id ? { ...b, status: "completed" } : b));
-                              }}
+                              onClick={() => updateBookingStatus(booking._id, "completed")}
                             >
                               <CheckCircle2 className="h-3.5 w-3.5" /> Mark Complete
                             </Button>
