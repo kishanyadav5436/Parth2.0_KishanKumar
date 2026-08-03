@@ -72,12 +72,35 @@ export default function Booking() {
   // Fetch service details
   useEffect(() => {
     const fetchService = async () => {
-      // Validate that serviceId looks like a MongoDB ObjectId (24 hex chars)
-      if (!serviceId || !/^[a-fA-F0-9]{24}$/.test(serviceId)) {
-        setError("Invalid service link. Please go back and select a valid service.");
+      // Check if serviceId is a valid MongoDB ObjectId (24 hex chars)
+      const isValidObjectId = serviceId && /^[a-fA-F0-9]{24}$/.test(serviceId);
+
+      if (!isValidObjectId) {
+        // Not a MongoDB ID — try to look up from mock data (e.g. "ac1", "pl3")
+        try {
+          const { MOCK_PROVIDERS } = await import("../data/mockData");
+          const allMock = Object.values(MOCK_PROVIDERS).flat();
+          const mockService = allMock.find((m: any) => m.id === serviceId);
+          if (mockService) {
+            // Build a service-like object from mock data
+            setService({
+              _id: mockService.id,
+              title: mockService.service,
+              price: mockService.priceValue || 0,
+              category: mockService.category,
+              location: mockService.location,
+              provider: { _id: mockService.id, name: mockService.name },
+            });
+          } else {
+            setError("Invalid service link. Please go back and select a valid service.");
+          }
+        } catch {
+          setError("Invalid service link. Please go back and select a valid service.");
+        }
         setIsLoading(false);
         return;
       }
+
       try {
         const res = await fetch(`${API_BASE_URL}/api/services/${serviceId}`, { credentials: 'include' });
         if (!res.ok) throw new Error("Service not found");
@@ -109,13 +132,28 @@ export default function Booking() {
     if (!formData.address) { setError("Please enter your service address."); return; }
 
     setIsSubmitting(true);
+
+    // Determine the real service ID to send to the backend
+    const realServiceId = service?._id || serviceId;
+    const isRealService = realServiceId && /^[a-fA-F0-9]{24}$/.test(realServiceId);
+
+    if (!isRealService) {
+      // Mock/demo service — simulate a successful booking
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setIsSuccess(true);
+        setTimeout(() => navigate('/'), 3500);
+      }, 800);
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/bookings`, {
         method: 'POST',
         credentials: 'include',           
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          serviceId,
+          serviceId: realServiceId,
           date: format(date, "yyyy-MM-dd"),
           timeSlot: selectedTime,
           description: formData.message,
