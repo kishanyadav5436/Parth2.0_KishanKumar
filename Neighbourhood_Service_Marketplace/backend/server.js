@@ -10,9 +10,8 @@ const bookingRoutes = require('./routes/bookings');
 const reviewRoutes = require('./routes/reviews');
 const serviceRoutes = require('./routes/services');
 
-
+// Load .env for local development (Vercel injects env vars automatically in production)
 dotenv.config();
-connectDB();
 
 const app = express();
 
@@ -27,6 +26,17 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+
+// Ensure MongoDB is connected before handling any API request
+app.use('/api', async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.error('DB connection failed:', err);
+        res.status(500).json({ message: 'Database connection failed', error: err.message });
+    }
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/providers', providerRoutes);
@@ -51,4 +61,4 @@ if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`Server running on port ${PORT}`);
     });
-}
+}
