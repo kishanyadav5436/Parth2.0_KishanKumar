@@ -101,4 +101,29 @@ router.patch('/:id/status', verifyToken, async (req, res) => {
     }
 });
 
+// Reschedule booking
+router.patch('/:id/reschedule', verifyToken, async (req, res) => {
+    try {
+        const { date, timeSlot } = req.body;
+        if (!date) return res.status(400).json({ message: 'Date is required' });
+
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+        const isProvider = booking.provider.toString() === req.user.id.toString();
+        const isCustomer = booking.customer.toString() === req.user.id.toString();
+        if (!isProvider && !isCustomer) {
+            return res.status(403).json({ message: 'Not authorized to reschedule this booking' });
+        }
+
+        booking.date = new Date(date);
+        if (timeSlot) booking.timeSlot = timeSlot;
+        await booking.save();
+
+        res.json({ message: 'Booking rescheduled successfully', booking });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
 module.exports = router;

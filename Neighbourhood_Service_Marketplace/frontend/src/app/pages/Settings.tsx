@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Bell, Shield, Moon, Sun, LogOut, ChevronRight, Save, Wrench, Star, Zap, BookOpen, ArrowRight } from "lucide-react";
+import { User, Bell, Shield, Moon, Sun, LogOut, ChevronRight, Save, Wrench, Star, Zap, BookOpen, ArrowRight, Plus, Trash2 } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
@@ -16,7 +16,36 @@ export default function Settings() {
   const { user, setUser, theme, toggleTheme } = useAppContext();
   const navigate = useNavigate();
   const [isAddServiceOpen, setIsAddServiceOpen] = useState(false);
+  const [myServices, setMyServices] = useState<any[]>([]);
   const isProvider = user?.role === 'provider';
+
+  React.useEffect(() => {
+    if (isProvider && user) {
+      const fetchMyServices = async () => {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/services?provider=${user._id || user.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            setMyServices(data);
+          }
+        } catch (e) {}
+      };
+      fetchMyServices();
+    }
+  }, [isProvider, user, isAddServiceOpen]);
+
+  const handleDeleteService = async (serviceId: string) => {
+    if (!confirm("Are you sure you want to delete this service listing?")) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/services/${serviceId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (res.ok) {
+        setMyServices(prev => prev.filter(s => s._id !== serviceId));
+      }
+    } catch (e) {}
+  };
 
   const handleSignOut = async () => {
     try {
@@ -168,6 +197,31 @@ export default function Settings() {
                 <p className="text-slate-600 dark:text-slate-400 mb-6 font-medium leading-relaxed">
                   As a service provider, you can manage your service profile, set your rates, and track your bookings from this panel. Clients will see your profile in search results.
                 </p>
+
+                {/* Service Listings List */}
+                {myServices.length > 0 && (
+                  <div className="mb-6 space-y-3">
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">My Active Listings ({myServices.length})</p>
+                    <div className="grid gap-3">
+                      {myServices.map(service => (
+                        <div key={service._id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700">
+                          <div>
+                            <p className="font-bold text-slate-900 dark:text-white text-sm">{service.title}</p>
+                            <p className="text-xs text-slate-400 font-medium">{service.category} • ₹{service.price}/hr</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDeleteService(service._id)}
+                            className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-900/20 h-9 px-3 rounded-xl gap-1 text-xs font-bold"
+                          >
+                            <Trash2 className="h-4 w-4" /> Delete
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="grid md:grid-cols-3 gap-4">
                   {[
                     { label: 'Manage Listings', icon: Wrench, desc: 'Update your services', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' },

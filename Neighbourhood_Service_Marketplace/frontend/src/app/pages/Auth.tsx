@@ -130,7 +130,9 @@ export default function Auth() {
                   <p className="text-emerald-600 dark:text-emerald-500 text-xs mt-0.5">You can list services, accept bookings, and earn from local clients.</p>
                 </div>
               </div>
-            )}            <Tabs defaultValue="login" className="space-y-8">
+            )}
+
+            <Tabs defaultValue="login" className="space-y-8">
               <TabsList className="grid w-full grid-cols-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
                 <TabsTrigger value="login" className="rounded-lg font-bold text-slate-600 dark:text-slate-400 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-slate-900 dark:data-[state=active]:text-white shadow-sm">Sign In</TabsTrigger>
                 <TabsTrigger value="signup" className="rounded-lg font-bold text-slate-600 dark:text-slate-400 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-slate-900 dark:data-[state=active]:text-white shadow-sm">Create Account</TabsTrigger>

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Calendar, Clock, MapPin, Phone, User, CheckCircle2,
   XCircle, AlertCircle, Loader2, Lock, RefreshCw,
-  ArrowRight, Package, Star, Banknote
+  ArrowRight, Package, Star, Banknote, FileText, Printer, Edit2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../components/ui/button";
@@ -70,7 +70,7 @@ const tabs: { id: string; label: string; statuses: BookingStatus[] | null }[] = 
 ];
 
 export default function MyBookings() {
-  const { user, isLoading: authLoading } = useAppContext();
+  const { user, isLoading: authLoading, addNotification } = useAppContext();
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,9 +78,15 @@ export default function MyBookings() {
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [selectedReviewBooking, setSelectedReviewBooking] = useState<any>(null);
 
+  // New features state
+  const [selectedReceiptBooking, setSelectedReceiptBooking] = useState<Booking | null>(null);
+  const [rescheduleBooking, setRescheduleBooking] = useState<Booking | null>(null);
+  const [rescheduleDate, setRescheduleDate] = useState("");
+  const [rescheduleTime, setRescheduleTime] = useState("");
+  const [isRescheduling, setIsRescheduling] = useState(false);
+
   const updateBookingStatus = async (bookingId: string, status: BookingStatus) => {
     if (bookingId.startsWith("mock-")) {
-      // Update mock booking in localStorage
       try {
         const localMockStr = localStorage.getItem("mockBookings");
         if (localMockStr) {
@@ -94,6 +100,7 @@ export default function MyBookings() {
       setBookings((prev) =>
         prev.map((b) => (b._id === bookingId ? { ...b, status } : b))
       );
+      triggerNotification(bookingId, status);
       return true;
     }
 
@@ -108,12 +115,66 @@ export default function MyBookings() {
         setBookings((prev) =>
           prev.map((b) => (b._id === bookingId ? { ...b, status } : b))
         );
+        triggerNotification(bookingId, status);
         return true;
       }
     } catch (err) {
       console.error(err);
     }
     return false;
+  };
+
+  const triggerNotification = (bookingId: string, status: BookingStatus) => {
+    const target = bookings.find(b => b._id === bookingId);
+    const title = target?.service?.title || "Service";
+    if (status === "accepted") {
+      addNotification({ title: "Booking Confirmed! 🎉", message: `Your request for ${title} has been accepted by the provider.`, type: "booking" });
+    } else if (status === "completed") {
+      addNotification({ title: "Service Completed! ✅", message: `Your ${title} service has been marked complete. Please leave a review!`, type: "booking" });
+    } else if (status === "rejected") {
+      addNotification({ title: "Booking Cancelled ℹ️", message: `The booking for ${title} was cancelled.`, type: "system" });
+    }
+  };
+
+  const handleRescheduleSubmit = async () => {
+    if (!rescheduleBooking || !rescheduleDate || !rescheduleTime) return;
+    setIsRescheduling(true);
+
+    if (rescheduleBooking._id.startsWith("mock-")) {
+      try {
+        const localMockStr = localStorage.getItem("mockBookings");
+        if (localMockStr) {
+          const list = JSON.parse(localMockStr);
+          const updated = list.map((b: any) =>
+            b._id === rescheduleBooking._id ? { ...b, date: new Date(rescheduleDate).toISOString(), timeSlot: rescheduleTime } : b
+          );
+          localStorage.setItem("mockBookings", JSON.stringify(updated));
+        }
+      } catch (err) {}
+      setBookings(prev => prev.map(b => b._id === rescheduleBooking._id ? { ...b, date: new Date(rescheduleDate).toISOString(), timeSlot: rescheduleTime } : b));
+      addNotification({ title: "Booking Rescheduled 📅", message: `Rescheduled to ${rescheduleDate} at ${rescheduleTime}.`, type: "booking" });
+      setRescheduleBooking(null);
+      setIsRescheduling(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/bookings/${rescheduleBooking._id}/reschedule`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date: rescheduleDate, timeSlot: rescheduleTime }),
+      });
+      if (res.ok) {
+        setBookings(prev => prev.map(b => b._id === rescheduleBooking._id ? { ...b, date: new Date(rescheduleDate).toISOString(), timeSlot: rescheduleTime } : b));
+        addNotification({ title: "Booking Rescheduled 📅", message: `Rescheduled to ${rescheduleDate} at ${rescheduleTime}.`, type: "booking" });
+        setRescheduleBooking(null);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsRescheduling(false);
+    }
   };
 
   const fetchBookings = async () => {
@@ -479,6 +540,34 @@ export default function MyBookings() {
                             </Button>
                           )}
 
+                          {/* Reschedule button for pending/accepted */}
+                          {(booking.status === "pending" || booking.status === "accepted") && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setRescheduleBooking(booking);
+                                setRescheduleDate(booking.date ? format(new Date(booking.date), "yyyy-MM-dd") : "");
+                                setRescheduleTime(booking.timeSlot || "10:00 AM");
+                              }}
+                              className="border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-bold rounded-xl h-9 px-4 text-xs gap-1"
+                            >
+                              <Edit2 className="h-3.5 w-3.5" /> Reschedule
+                            </Button>
+                          )}
+
+                          {/* View Receipt button for completed */}
+                          {booking.status === "completed" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedReceiptBooking(booking)}
+                              className="border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold rounded-xl h-9 px-4 text-xs gap-1"
+                            >
+                              <FileText className="h-3.5 w-3.5" /> View Receipt
+                            </Button>
+                          )}
+
                           {/* Customer: leave review on completed */}
                           {!isProvider && booking.status === "completed" && (
                             <Button
@@ -514,6 +603,102 @@ export default function MyBookings() {
           booking={selectedReviewBooking}
           onClose={() => setSelectedReviewBooking(null)}
         />
+
+        {/* Reschedule Modal */}
+        {rescheduleBooking && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800">
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                <Edit2 className="h-6 w-6 text-blue-600" /> Reschedule Appointment
+              </h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 font-medium">Pick a new date and preferred time slot for your appointment.</p>
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">New Date</label>
+                  <input
+                    type="date"
+                    value={rescheduleDate}
+                    min={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setRescheduleDate(e.target.value)}
+                    className="w-full h-12 px-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">New Time Slot</label>
+                  <select
+                    value={rescheduleTime}
+                    onChange={(e) => setRescheduleTime(e.target.value)}
+                    className="w-full h-12 px-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold text-sm"
+                  >
+                    {["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"].map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={() => setRescheduleBooking(null)} className="flex-1 h-12 rounded-xl font-bold dark:text-white">Cancel</Button>
+                <Button onClick={handleRescheduleSubmit} disabled={isRescheduling} className="flex-1 h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2">
+                  {isRescheduling ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save New Time"}
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Booking Receipt Modal */}
+        {selectedReceiptBooking && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-slate-900 rounded-3xl p-8 max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between pb-6 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-lg">SH</div>
+                  <div>
+                    <h3 className="font-black text-lg text-slate-900 dark:text-white">ServiceHub Receipt</h3>
+                    <p className="text-xs text-slate-400 font-medium">Receipt #{selectedReceiptBooking._id.slice(-8).toUpperCase()}</p>
+                  </div>
+                </div>
+                <button onClick={() => setSelectedReceiptBooking(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-black">✕</button>
+              </div>
+
+              <div className="py-6 space-y-4 text-sm">
+                <div className="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800/50">
+                  <span className="text-slate-400 font-medium">Service</span>
+                  <span className="font-black text-slate-900 dark:text-white">{selectedReceiptBooking.service?.title || "Service"}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800/50">
+                  <span className="text-slate-400 font-medium">Provider</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{selectedReceiptBooking.provider?.name || "Provider"}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800/50">
+                  <span className="text-slate-400 font-medium">Date & Time</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{selectedReceiptBooking.date ? format(new Date(selectedReceiptBooking.date), "MMM dd, yyyy") : "—"} @ {selectedReceiptBooking.timeSlot}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800/50">
+                  <span className="text-slate-400 font-medium">Address</span>
+                  <span className="font-bold text-slate-900 dark:text-white max-w-[60%] text-right truncate">{selectedReceiptBooking.address}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800/50">
+                  <span className="text-slate-400 font-medium">Payment Method</span>
+                  <span className="font-bold text-slate-900 dark:text-white uppercase">{selectedReceiptBooking.paymentMethod || "CASH"}</span>
+                </div>
+                <div className="flex justify-between py-3 text-base pt-4">
+                  <span className="font-black text-slate-900 dark:text-white">Total Amount Paid</span>
+                  <span className="font-black text-2xl text-blue-600 dark:text-blue-400">₹{selectedReceiptBooking.service?.price || 0}</span>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <Button variant="outline" onClick={() => window.print()} className="flex-1 h-12 rounded-xl font-bold dark:text-white gap-2">
+                  <Printer className="h-4 w-4" /> Print / PDF
+                </Button>
+                <Button onClick={() => setSelectedReceiptBooking(null)} className="flex-1 h-12 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold">
+                  Close
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, Search, User, Home, Moon, Sun, Settings, LogOut, Wrench, ChevronDown, BookOpen, Bell, Check, ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAppContext } from "../context/AppContext";
 import { Badge } from "./ui/badge";
 import { API_BASE_URL } from "../config";
@@ -10,6 +10,22 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setIsNotifOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const navigate = useNavigate();
   const { user, setUser, theme, toggleTheme, notifications, unreadNotificationsCount, markNotificationAsRead, clearAllNotifications } = useAppContext();
 
@@ -62,7 +78,7 @@ export default function Navbar() {
             </Button>
 
             {/* Notification Bell */}
-            <div className="relative">
+            <div className="relative" ref={notifRef}>
               <Button
                 variant="ghost"
                 size="sm"
@@ -147,7 +163,7 @@ export default function Navbar() {
 
             {/* Auth / User Section */}
             {user ? (
-              <div className="relative">
+              <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className="flex items-center space-x-2 rounded-xl px-3 py-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"

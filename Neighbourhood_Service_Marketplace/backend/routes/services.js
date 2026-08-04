@@ -69,4 +69,21 @@ router.put('/:id', verifyToken, isProvider, async (req, res) => {
     }
 });
 
+// Delete a service (Provider only)
+router.delete('/:id', verifyToken, isProvider, async (req, res) => {
+    try {
+        const service = await Service.findById(req.params.id);
+        if (!service) return res.status(404).json({ message: 'Service not found' });
+
+        if (service.provider.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        await Service.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Service deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
 module.exports = router;

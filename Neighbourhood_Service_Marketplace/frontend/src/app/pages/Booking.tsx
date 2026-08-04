@@ -187,7 +187,7 @@ export default function Booking() {
 
       if (response.ok) {
         setIsSuccess(true);
-        setTimeout(() => navigate('/'), 3500);
+        setTimeout(() => navigate('/bookings'), 3500);
       } else if (response.status === 401) {
         setError("You must be logged in to book a service.");
         setTimeout(() => navigate(`/auth?redirect=/booking/${serviceId}`), 1500);

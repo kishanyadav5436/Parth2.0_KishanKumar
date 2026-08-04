@@ -19,6 +19,40 @@ export default function ProviderProfile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
+      const isValidObjectId = id && /^[a-fA-F0-9]{24}$/.test(id);
+
+      if (!isValidObjectId) {
+        // Mock provider ID — build profile from mock data
+        try {
+          const { MOCK_PROVIDERS } = await import("../data/mockData");
+          const allMock = Object.values(MOCK_PROVIDERS).flat();
+          const mockProvider = allMock.find((m: any) => m.id === id);
+          if (mockProvider) {
+            setProvider({
+              user: { _id: id, name: mockProvider.name },
+              category: mockProvider.category || mockProvider.service,
+              serviceName: mockProvider.service,
+              bio: `Expert ${mockProvider.service} professional with years of experience. Trusted by hundreds of happy customers in ${mockProvider.location}.`,
+              averageRating: mockProvider.rating || 4.8,
+              totalReviews: mockProvider.reviews || 0,
+              hourlyRate: mockProvider.priceValue || 500,
+              location: mockProvider.location,
+              image: mockProvider.image,
+            });
+            // Build mock services list
+            setServices([{
+              _id: id,
+              title: mockProvider.service,
+              category: mockProvider.category || mockProvider.service,
+              price: mockProvider.priceValue || 500,
+              description: `Professional ${mockProvider.service} service by ${mockProvider.name}. Quality guaranteed.`,
+            }]);
+          }
+        } catch { /* ignore */ }
+        setIsLoading(false);
+        return;
+      }
+
       try {
         // Try fetching by Profile ID first
         let profileRes = await fetch(`${API_BASE_URL}/api/providers/${id}`);

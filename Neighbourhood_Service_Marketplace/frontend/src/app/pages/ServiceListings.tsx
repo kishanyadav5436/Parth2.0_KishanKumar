@@ -29,6 +29,17 @@ export default function ServiceListings() {
   const [priceRange, setPriceRange] = useState([0, 2000]);
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
 
+  // Sync search inputs to URL params
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const newParams = new URLSearchParams();
+      if (searchQuery) newParams.set("q", searchQuery);
+      if (locationQuery) newParams.set("loc", locationQuery);
+      setSearchParams(newParams, { replace: true });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, locationQuery, setSearchParams]);
+
 
   useEffect(() => {
     const fetchProviders = async () => {
